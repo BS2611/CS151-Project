@@ -82,14 +82,24 @@ public class GoalListController {
     @FXML
     private void refreshGoals() {
         List<Goal> goals = new ArrayList<>(goalPlanner.getAllGoals());
-
         goals.sort(
-                Comparator.comparing(Goal::getCreationDate).reversed()
+                Comparator.comparing(Goal::getTargetDate).reversed()
         );
 
         goalsTable.setItems(
                 FXCollections.observableArrayList(goals)
         );
+    }
+
+    @FXML
+    private void createMilestone() throws IOException {
+        Goal selectedGoal = goalsTable.getSelectionModel().getSelectedItem();
+
+        if (selectedGoal == null) {
+            return;
+        }
+
+        Main.showMilestonePage();
     }
 
     @FXML
