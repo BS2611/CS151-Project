@@ -5,6 +5,8 @@ import cs151.backend.exception.ValidationException;
 import cs151.backend.model.Goal;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class GoalTest extends BackendTestBase {
@@ -26,6 +28,17 @@ class GoalTest extends BackendTestBase {
         Goal g = planner.createGoal("Defaults", null, "Other", today.plusDays(1));
         assertEquals("Not Started", g.getStatus());
         assertEquals(0, g.getProgress());
+    }
+
+    /** v0.5: goals are listed with the latest target date on top. */
+    @Test
+    void goalsListedLatestTargetDateFirst() {
+        planner.createGoal("Soon", "", "Other", today.plusDays(5));
+        planner.createGoal("Far", "", "Other", today.plusDays(60));
+        planner.createGoal("Mid", "", "Other", today.plusDays(20));
+
+        List<String> names = planner.getAllGoals().stream().map(Goal::getName).toList();
+        assertEquals(List.of("Far", "Mid", "Soon"), names);
     }
 
     @Test

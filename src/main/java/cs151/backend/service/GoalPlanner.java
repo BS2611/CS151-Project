@@ -10,7 +10,6 @@ import cs151.backend.model.ProgressEntry;
 import cs151.backend.model.Task;
 import cs151.backend.persistence.DAL;
 import cs151.backend.persistence.DataManager;
-import cs151.backend.persistence.FileSystemDAL;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -27,10 +26,10 @@ public class GoalPlanner {
     //Goal persistence uses the DAL abstraction so storage can be changed to db later.
     private final DAL goalDal;
 
-    /** Uses the file system to store goals. */
+    /** Uses the sqlite to store goals. */
     public GoalPlanner() {
         this.dataManager = new DataManager();
-        this.goalDal = new FileSystemDAL();
+        this.goalDal = new DataManager();
     }
 
     public GoalPlanner(DataManager dataManager) {

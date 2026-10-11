@@ -8,6 +8,8 @@ import cs151.backend.model.ProgressEntry;
 import cs151.backend.model.Task;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class MilestoneTaskProgressTest extends BackendTestBase {
@@ -40,6 +42,31 @@ class MilestoneTaskProgressTest extends BackendTestBase {
     void sameMilestoneNameInDifferentGoalsAllowed() {
         newMilestone(newGoal("G1"), "M");
         assertDoesNotThrow(() -> newMilestone(newGoal("G2"), "M"));
+    }
+
+    /** v0.5: a goal's milestones are listed with the latest target date on top. */
+    @Test
+    void milestonesListedLatestTargetDateFirst() {
+        Goal g = newGoal("G");
+        planner.createMilestone(g.getId(), "Early", today.plusDays(5), null);
+        planner.createMilestone(g.getId(), "Late", today.plusDays(20), null);
+        planner.createMilestone(g.getId(), "Middle", today.plusDays(10), null);
+
+        List<String> names = planner.getMilestonesForGoal(g.getId()).stream()
+                .map(Milestone::getMilestoneName).toList();
+        assertEquals(List.of("Late", "Middle", "Early"), names);
+    }
+
+    /** v0.5: a saved milestone is linked to its goal and only listed under that goal. */
+    @Test
+    void milestoneIsOnlyListedUnderItsOwnGoal() {
+        Goal a = newGoal("A");
+        Goal b = newGoal("B");
+        Milestone m = newMilestone(a, "M");
+
+        assertEquals(a.getId(), m.getGoalId());
+        assertEquals(1, planner.getMilestonesForGoal(a.getId()).size());
+        assertTrue(planner.getMilestonesForGoal(b.getId()).isEmpty());
     }
 
     @Test
