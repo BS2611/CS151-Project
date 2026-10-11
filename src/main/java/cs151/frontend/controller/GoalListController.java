@@ -7,19 +7,21 @@ import javafx.beans.property.ReadOnlyIntegerWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
 
 public class GoalListController {
 
     @FXML
     private TableView<Goal> goalsTable;
+
+    @FXML
+    private Label messageLabel;
 
     @FXML
     private TableColumn<Goal, String> nameColumn;
@@ -76,30 +78,62 @@ public class GoalListController {
                 cell -> new ReadOnlyStringWrapper(formatDate(cell.getValue().getCreationDate()))
         );
 
+        // Double-clicking a goal row opens the list of its milestones.
+        goalsTable.setRowFactory(table -> {
+            TableRow<Goal> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && !row.isEmpty()) {
+                    openMilestoneList(row.getItem());
+                }
+            });
+            return row;
+        });
+
         refreshGoals();
     }
 
+    /** The backend already returns the goals sorted by target date, latest first. */
     @FXML
     private void refreshGoals() {
-        List<Goal> goals = new ArrayList<>(goalPlanner.getAllGoals());
-        goals.sort(
-                Comparator.comparing(Goal::getTargetDate).reversed()
-        );
-
         goalsTable.setItems(
-                FXCollections.observableArrayList(goals)
+                FXCollections.observableArrayList(goalPlanner.getAllGoals())
         );
     }
 
     @FXML
     private void createMilestone() throws IOException {
-        Goal selectedGoal = goalsTable.getSelectionModel().getSelectedItem();
+        Goal selected = goalsTable.getSelectionModel().getSelectedItem();
 
-        if (selectedGoal == null) {
+        if (selected == null) {
+            showMessage("Select a goal first.");
             return;
         }
 
-        Main.showMilestonePage();
+        Main.showMilestonePage(selected);
+    }
+
+    @FXML
+    private void viewMilestones() {
+        Goal selected = goalsTable.getSelectionModel().getSelectedItem();
+
+        if (selected == null) {
+            showMessage("Select a goal first.");
+            return;
+        }
+
+        openMilestoneList(selected);
+    }
+
+    private void openMilestoneList(Goal goal) {
+        try {
+            Main.showMilestoneListPage(goal);
+        } catch (IOException exception) {
+            showMessage("Could not open the milestone page.");
+        }
+    }
+
+    private void showMessage(String message) {
+        messageLabel.setText(message);
     }
 
     @FXML

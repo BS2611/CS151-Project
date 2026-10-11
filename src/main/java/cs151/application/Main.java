@@ -1,5 +1,8 @@
 package cs151.application;
 
+import cs151.backend.model.Goal;
+import cs151.frontend.controller.MilestoneController;
+import cs151.frontend.controller.MilestoneListController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -33,18 +36,34 @@ public class Main extends Application {
 
     public static void showGoalListPage() throws IOException {
         scene.setRoot(loadView("goal-list-view.fxml"));
-
-    }
-    public static void showMilestonePage() throws IOException {
-        scene.setRoot(loadView("milestone-view.fxml"));
     }
 
+    /** Shows the Milestone page (create form) with the given goal pre-selected. */
+    public static void showMilestonePage(Goal goal) throws IOException {
+        FXMLLoader loader = createLoader("milestone-view.fxml");
+        scene.setRoot(loader.load());
 
-    private static Parent loadView(String fileName) throws IOException {
-        FXMLLoader loader = new FXMLLoader(
+        MilestoneController controller = loader.getController();
+        controller.setGoal(goal);
+    }
+
+    /** Shows the Milestone List page with all milestones of the given goal. */
+    public static void showMilestoneListPage(Goal goal) throws IOException {
+        FXMLLoader loader = createLoader("milestone-list-view.fxml");
+        scene.setRoot(loader.load());
+
+        MilestoneListController controller = loader.getController();
+        controller.setGoal(goal);
+    }
+
+    private static FXMLLoader createLoader(String fileName) {
+        return new FXMLLoader(
                 Main.class.getResource("/cs151/frontend/view/" + fileName)
         );
-        return loader.load();
+    }
+
+    private static Parent loadView(String fileName) throws IOException {
+        return createLoader(fileName).load();
     }
 
     public static void main(String[] args) {

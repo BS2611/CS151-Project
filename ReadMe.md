@@ -3,9 +3,9 @@
 # Who did What
 
 # Version 0.5
-1. Keerat Kaur: Created the Milestone page UI and updated the Goal List to support Create Milestone navigation
-2. Bhavpreet Singh: Implemented milestone saving and connected milestones to their associated goals
-3. Sujata Giri: Implemented the Milestone List page, cleaned the project folder, updated the ReadMe.md, and prepared the final ZIP
+1. Keerat Kaur: Created the Milestone page UI (Goal, Milestone Name, Target Date, Status) and added the Create Milestone button to the Goal list page
+2. Bhavpreet Singh: Backend - saved Milestones permanently in SQLite and connected each Milestone to its associated Goal; Goals and Milestones are sorted by Target Date descending
+3. Sujata Giri: Implemented the Milestone list page (JavaFX TableView), cleaned the project folder, updated the ReadMe.md, and created the final ZIP
 
 # Version 0.4
 1. Keerat Kaur: Implemented permanent saving of Goal data (DAL interface, FileSystemDAL, data/goals.txt) and the success message on the Goal page
@@ -33,6 +33,8 @@ Run the project with Zulu 23 using Maven.
 
 Please run 'Main.java' (package cs151.application) to run the application.
 
-Data note: Goals are saved permanently in the file data/goals.txt, which is created automatically at runtime. No manual setup is required. The sqlite-jdbc library used by the backend is declared as a dependency in pom.xml.
+Data note: Goals and Milestones are saved permanently in the SQLite database file data/my-goal-tracker.db, which is created automatically at runtime. No manual setup is required. The sqlite-jdbc library used by the backend is declared as a dependency in pom.xml.
+
+How to use: On the Home page click "View Goals", select a goal and click "Create Milestone" to add a milestone to it. Double-click a goal (or click "View Milestones") to list its milestones.
 
 Thank You!
