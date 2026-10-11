@@ -2,6 +2,11 @@
 
 # Who did What
 
+# Version 0.5
+1. Keerat Kaur: Created the Milestone page UI and updated the Goal List to support Create Milestone navigation
+2. Bhavpreet Singh: Implemented milestone saving and connected milestones to their associated goals
+3. Sujata Giri: Implemented the Milestone List page, cleaned the project folder, updated the ReadMe.md, and prepared the final ZIP
+
 # Version 0.4
 1. Keerat Kaur: Implemented permanent saving of Goal data (DAL interface, FileSystemDAL, data/goals.txt) and the success message on the Goal page
 2. Sujata Giri: Implemented the Stored Goals page (JavaFX TableView sorted by creation date, most recent on top) with Back/Refresh buttons and navigation from the Home page
