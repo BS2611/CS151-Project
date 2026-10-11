@@ -33,7 +33,12 @@ public class Main extends Application {
 
     public static void showGoalListPage() throws IOException {
         scene.setRoot(loadView("goal-list-view.fxml"));
+
     }
+    public static void showMilestonePage() throws IOException {
+        scene.setRoot(loadView("milestone-view.fxml"));
+    }
+
 
     private static Parent loadView(String fileName) throws IOException {
         FXMLLoader loader = new FXMLLoader(
