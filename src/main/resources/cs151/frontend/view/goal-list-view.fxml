@@ -24,7 +24,7 @@
             <Label text="Stored Goals"
                    style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
 
-            <Label text="Goals are displayed with the most recently created first."/>
+            <Label text="Goals are displayed by Target Date, most recent first."/>
         </VBox>
     </top>
 
@@ -74,6 +74,7 @@
 
             <Button text="Back" onAction="#goBack"/>
             <Button text="Refresh" onAction="#refreshGoals"/>
+            <Button text="Create Milestone" onAction="#createMilestone"/>
         </HBox>
     </bottom>
 
