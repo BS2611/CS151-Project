@@ -35,6 +35,6 @@ Please run 'Main.java' (package cs151.application) to run the application.
 
 Data note: Goals and Milestones are saved permanently in the SQLite database file data/my-goal-tracker.db, which is created automatically at runtime. No manual setup is required. The sqlite-jdbc library used by the backend is declared as a dependency in pom.xml.
 
-How to use: On the Home page click "View Goals", select a goal and click "Create Milestone" to add a milestone to it. Double-click a goal (or click "View Milestones") to list its milestones.
+How to use: On the Home page click "List Goals" (goals are sorted by Target Date, latest first). Select a goal and click "Create Milestone" to open the Milestone page, then enter the milestone and click "Save". Double-click a goal (or select it and click "View Milestones") to open the Milestone List page, which shows that goal's milestones in a table sorted by Target Date, latest first. Every page has a "Back" button.
 
 Thank You!

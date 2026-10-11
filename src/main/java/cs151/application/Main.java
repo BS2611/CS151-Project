@@ -11,6 +11,10 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
+/**
+ * Entry point of the Personal Goal Planner. Opens the window with the Home page and provides the static
+ * methods the controllers use to switch between pages.
+ */
 public class Main extends Application {
 
     private static Scene scene;

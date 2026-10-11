@@ -34,7 +34,7 @@
             style="-fx-font-size: 16px; -fx-background-color: #1976D2; -fx-text-fill: white; -fx-background-radius: 6px;"/>
 
     <Button fx:id="viewGoalsButton"
-            text="View Goals"
+            text="List Goals"
             onAction="#openGoalListPage"
             prefWidth="200.0"
             prefHeight="45.0"

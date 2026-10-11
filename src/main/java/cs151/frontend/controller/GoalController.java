@@ -1,6 +1,7 @@
 package cs151.frontend.controller;
 
 import cs151.application.Main;
+import cs151.backend.exception.PersistenceException;
 import cs151.backend.exception.ValidationException;
 import cs151.backend.model.Goal;
 import cs151.backend.service.GoalPlanner;
@@ -15,6 +16,10 @@ import javafx.scene.control.TextField;
 import java.io.IOException;
 import java.time.LocalDate;
 
+/**
+ * Controller of the Goal page (goal-view.fxml). Reads the form, lets {@link GoalPlanner} validate and store
+ * the goal, and shows a success or error message.
+ */
 public class GoalController {
 
     private final GoalPlanner goalPlanner = new GoalPlanner();
@@ -90,7 +95,8 @@ public class GoalController {
 
             clearForm();
 
-        } catch (ValidationException exception) {
+        } catch (ValidationException | PersistenceException exception) {
+            // Business-rule violations and failed database operations are both shown to the user.
             showError(exception.getMessage());
         }
     }

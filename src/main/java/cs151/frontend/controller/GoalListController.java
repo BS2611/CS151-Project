@@ -15,6 +15,10 @@ import javafx.scene.control.TableView;
 import java.io.IOException;
 import java.time.LocalDate;
 
+/**
+ * Controller of the Goal List page (goal-list-view.fxml). Lists all goals (latest target date first) and lets
+ * the user create a milestone for the selected goal or open the Milestone List page of a goal.
+ */
 public class GoalListController {
 
     @FXML
@@ -100,6 +104,7 @@ public class GoalListController {
         );
     }
 
+    /** Opens the Milestone page for the selected goal. */
     @FXML
     private void createMilestone() throws IOException {
         Goal selected = goalsTable.getSelectionModel().getSelectedItem();
@@ -112,6 +117,7 @@ public class GoalListController {
         Main.showMilestonePage(selected);
     }
 
+    /** Opens the Milestone List page for the selected goal. */
     @FXML
     private void viewMilestones() {
         Goal selected = goalsTable.getSelectionModel().getSelectedItem();
