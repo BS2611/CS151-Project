@@ -4,6 +4,10 @@ module cs151.application {
 
     requires com.dlsc.formsfx;
 
+    // Icons (FontAwesome 5 through Ikonli)
+    requires org.kordamp.ikonli.javafx;
+    requires org.kordamp.ikonli.fontawesome5;
+
     // Backend / SQLite persistence
     requires java.sql;
     requires org.xerial.sqlitejdbc;
