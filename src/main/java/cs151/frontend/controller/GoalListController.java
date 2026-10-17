@@ -35,7 +35,7 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
- * Controller of the Goal List page (goal-list-view.fxml). Lists all goals (latest target date first) and lets
+ * Controller of the Goal List page (goal-list-view.fxml). Lists all goals (soonest target date first) and lets
  * the user create a milestone for the selected goal or open the Milestone List page of a goal.
  */
 public class GoalListController {
@@ -336,7 +336,7 @@ public class GoalListController {
         statusFilter.setValue(ALL_STATUSES);
 
         sortCombo.setItems(FXCollections.observableArrayList(SORT_LATEST, SORT_SOONEST, SORT_NAME, SORT_PROGRESS));
-        sortCombo.setValue(SORT_LATEST);
+        sortCombo.setValue(SORT_SOONEST);
 
         rowsPerPageCombo.setItems(FXCollections.observableArrayList(5, 10, 25));
         rowsPerPageCombo.setValue(10);
@@ -458,7 +458,7 @@ public class GoalListController {
         showPage();
     }
 
-    /** The backend already returns the goals sorted by target date, latest first. */
+    /** The backend already returns the goals sorted by target date, soonest first. */
     @FXML
     private void refreshGoals() {
         allGoals = goalPlanner.getAllGoals();

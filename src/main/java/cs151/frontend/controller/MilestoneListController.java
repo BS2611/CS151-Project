@@ -18,7 +18,7 @@ import java.time.LocalDate;
 
 /**
  * Controller of the Milestone List page (milestone-list-view.fxml). Shows all stored milestones of one goal in a
- * TableView; the backend already returns them with the latest target date first.
+ * TableView; the backend already returns them with the soonest target date first.
  */
 public class MilestoneListController {
 
@@ -78,7 +78,7 @@ public class MilestoneListController {
         this.goal = goal;
         titleLabel.setText(goal.getName());
         subtitleLabel.setText(goal.getCategory() + "  •  Target " + goal.getTargetDate()
-                + "  •  " + goal.getProgress() + "% complete  •  Milestones, latest target date first");
+                + "  •  " + goal.getProgress() + "% complete  •  Milestones, soonest target date first");
         refreshMilestones();
     }
 

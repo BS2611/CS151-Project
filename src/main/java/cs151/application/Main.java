@@ -1,6 +1,8 @@
 package cs151.application;
 
 import cs151.backend.model.Goal;
+import cs151.backend.service.GoalPlanner;
+import cs151.backend.service.SeedData;
 import cs151.frontend.controller.MilestoneController;
 import cs151.frontend.controller.MilestoneListController;
 import javafx.application.Application;
@@ -43,6 +45,9 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws IOException {
         loadFonts();
+
+        // v0.6: make sure the sample goals and milestones exist on first launch
+        SeedData.seedIfEmpty(new GoalPlanner());
 
         stage = primaryStage;
         stage.initStyle(StageStyle.UNDECORATED);

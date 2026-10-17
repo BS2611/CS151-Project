@@ -287,7 +287,7 @@ public class DataManager implements DAL {
     }
 
     public List<Goal> getAllGoals() {
-        return queryList("SELECT * FROM goals ORDER BY target_date DESC, name", null, DataManager::mapGoal);
+        return queryList("SELECT * FROM goals ORDER BY target_date, name", null, DataManager::mapGoal);
     }
 
     // ------------------------------------------------------------------ milestones
@@ -336,7 +336,7 @@ public class DataManager implements DAL {
     }
 
     public List<Milestone> getMilestonesForGoal(long goalId) {
-        return queryList("SELECT * FROM milestones WHERE goal_id = ? ORDER BY target_date DESC, name", goalId,
+        return queryList("SELECT * FROM milestones WHERE goal_id = ? ORDER BY target_date, name", goalId,
                 DataManager::mapMilestone);
     }
 
