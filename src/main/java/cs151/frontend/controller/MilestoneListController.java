@@ -114,6 +114,19 @@ public class MilestoneListController {
     }
 
     @FXML
+    private void createTask() throws IOException {
+        Milestone selectedMilestone =
+                milestonesTable.getSelectionModel().getSelectedItem();
+
+        if (selectedMilestone == null) {
+            Motion.toast("Please select a milestone first.", false);
+            return;
+        }
+
+        Main.showTaskPage(selectedMilestone);
+    }
+
+    @FXML
     private void goBack() throws IOException {
         Main.showGoalListPage();
     }

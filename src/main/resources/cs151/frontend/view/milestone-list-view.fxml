@@ -39,6 +39,17 @@
                 <Button minWidth="-Infinity" text="Create milestone" onAction="#createMilestone" styleClass="primary-button" contentDisplay="LEFT" graphicTextGap="8.0">
                     <graphic><FontIcon iconLiteral="fas-plus"/></graphic>
                 </Button>
+                <Button minWidth="-Infinity"
+                        text="Create task"
+                        onAction="#createTask"
+                        styleClass="secondary-button"
+                        contentDisplay="LEFT"
+                        graphicTextGap="8.0">
+
+                    <graphic>
+                        <FontIcon iconLiteral="fas-plus"/>
+                    </graphic>
+                </Button>
             </HBox>
 
             <VBox styleClass="card" style="-fx-padding: 0;">
