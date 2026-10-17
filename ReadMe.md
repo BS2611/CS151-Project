@@ -2,9 +2,6 @@
 
 # Who did What
 
-# Version 0.5 - UI redesign (branch ui-redesign-v0.5)
-1. Bhavpreet Singh: Redesigned the Home, Goal, Goal List, Milestone and Milestone List pages (sidebar, top bar, goal table with filters/pagination/Actions menu, goal details and delete pop-ups, toasts and animations), added Ikonli icons and the bundled Inter font, and the custom window frame (own minimize/maximize/close with Windows snap support and macOS traffic lights). Frontend only: the backend, database and tests were not changed.
-
 # Version 0.5
 1. Keerat Kaur: Created the Milestone page UI (Goal, Milestone Name, Target Date, Status) and added the Create Milestone button to the Goal list page
 2. Bhavpreet Singh: Backend - saved Milestones permanently in SQLite and connected each Milestone to its associated Goal; Goals and Milestones are sorted by Target Date descending
