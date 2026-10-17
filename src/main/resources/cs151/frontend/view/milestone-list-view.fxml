@@ -59,6 +59,7 @@
 
             <Button text="Back" onAction="#goBack"/>
             <Button text="Refresh" onAction="#refreshMilestones"/>
+            <Button text="Create Task" onAction="#createTask"/>
             <Button text="Create Milestone" onAction="#createMilestone"/>
         </HBox>
     </bottom>

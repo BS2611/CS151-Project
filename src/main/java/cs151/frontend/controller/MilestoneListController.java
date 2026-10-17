@@ -10,6 +10,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.Alert;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -77,6 +78,22 @@ public class MilestoneListController {
     @FXML
     private void createMilestone() throws IOException {
         Main.showMilestonePage(goal);
+    }
+
+    @FXML
+    private void createTask() throws IOException {
+        Milestone selectedMilestone =
+                milestonesTable.getSelectionModel().getSelectedItem();
+
+        if (selectedMilestone == null) {
+            new Alert(
+                    Alert.AlertType.INFORMATION,
+                    "Please select a milestone first."
+            ).showAndWait();
+            return;
+        }
+
+        Main.showTaskPage(selectedMilestone);
     }
 
     @FXML

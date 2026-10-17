@@ -1,8 +1,10 @@
 package cs151.application;
 
 import cs151.backend.model.Goal;
+import cs151.backend.model.Milestone;
 import cs151.frontend.controller.MilestoneController;
 import cs151.frontend.controller.MilestoneListController;
+import cs151.frontend.controller.TaskController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -58,6 +60,16 @@ public class Main extends Application {
 
         MilestoneListController controller = loader.getController();
         controller.setGoal(goal);
+
+    }
+
+    /** Shows the Task page for the selected milestone. */
+    public static void showTaskPage(Milestone milestone) throws IOException {
+        FXMLLoader loader = createLoader("task-view.fxml");
+        scene.setRoot(loader.load());
+
+        TaskController controller = loader.getController();
+        controller.setMilestone(milestone);
     }
 
     private static FXMLLoader createLoader(String fileName) {
