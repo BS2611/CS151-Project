@@ -29,7 +29,7 @@
             <Label text="B" styleClass="avatar-text"/>
         </StackPane>
         <VBox spacing="0.0">
-            <Label text="Bhavpreet" styleClass="user-name"/>
+            <Label text="User" styleClass="user-name"/>
             <Label text="Personal Workspace" styleClass="user-sub"/>
         </VBox>
     </HBox>
