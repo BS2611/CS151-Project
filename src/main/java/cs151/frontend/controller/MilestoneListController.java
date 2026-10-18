@@ -125,10 +125,22 @@ public class MilestoneListController {
 
         Main.showTaskPage(selectedMilestone);
     }
-
     @FXML
     private void goBack() throws IOException {
         Main.showGoalListPage();
+    }
+
+    @FXML
+    private void viewTasks() throws IOException {
+        Milestone selectedMilestone =
+                milestonesTable.getSelectionModel().getSelectedItem();
+
+        if (selectedMilestone == null) {
+            Motion.toast("Please select a milestone first.", false);
+            return;
+        }
+
+        Main.showTaskListPage(selectedMilestone);
     }
 
     private String formatDate(LocalDate date) {
