@@ -2,6 +2,11 @@
 
 # Who did What
 
+# Version 0.6
+1. Bhavpreet Singh: Implemented the Task page UI and connected task creation to the selected Milestone
+2. Sujata Giri: Implemented permanent saving of Task data and populated three Goals with three Milestones each
+3. Keerat Kaur: Implemented the Task List page (JavaFX TableView), cleaned the project folder, updated the ReadMe.md, and created the final ZIP
+
 # Version 0.5
 1. Keerat Kaur: Created the Milestone page UI (Goal, Milestone Name, Target Date, Status) and added the Create Milestone button to the Goal list page
 2. Bhavpreet Singh: Backend - saved Milestones permanently in SQLite and connected each Milestone to its associated Goal; Goals and Milestones are sorted by Target Date descending
