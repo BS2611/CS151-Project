@@ -3,9 +3,9 @@
 # Who did What
 
 # Version 0.6
-1. Bhavpreet Singh: Implemented the Task page UI and connected task creation to the selected Milestone
-2. Sujata Giri: Implemented permanent saving of Task data and populated three Goals with three Milestones each
-3. Keerat Kaur: Implemented the Task List page (JavaFX TableView), cleaned the project folder, updated the ReadMe.md, and created the final ZIP
+1. Sujata Giri: Created the Task page UI (Description, Due Date, Priority, Status) and added the Create Task button to the Milestone list page
+2. Bhavpreet Singh: Backend - saved Tasks permanently in SQLite and connected each Task to its associated Milestone (Save Task button), populated 3 Goals with 3 Milestones each, and sorted Goals and Milestones by Target Date ascending
+3. Keerat Kaur: Implemented the Task List page (JavaFX TableView sorted by Target Date) and the View Tasks button, cleaned the project folder, updated the ReadMe.md, and created the final ZIP
 
 # Version 0.5
 1. Keerat Kaur: Created the Milestone page UI (Goal, Milestone Name, Target Date, Status) and added the Create Milestone button to the Goal list page
@@ -40,7 +40,7 @@ Please run 'Main.java' (package cs151.application) to run the application.
 
 Data note: Goals and Milestones are saved permanently in the SQLite database file data/my-goal-tracker.db, which is created automatically at runtime. No manual setup is required. The sqlite-jdbc library used by the backend is declared as a dependency in pom.xml.
 
-How to use: On the Home page click "List Goals" (goals are sorted by Target Date, latest first). Select a goal and click "Create Milestone" to open the Milestone page, then enter the milestone and click "Save". Double-click a goal (or select it and click "View Milestones") to open the Milestone List page, which shows that goal's milestones in a table sorted by Target Date, latest first. Every page has a "Back" button.
+How to use: On the Home page click "List Goals" (goals are sorted by Target Date, soonest first). Select a goal and click "Create Milestone" to open the Milestone page, then enter the milestone and click "Save". Double-click a goal (or select it and click "View Milestones") to open the Milestone List page, which shows that goal's milestones in a table sorted by Target Date, soonest first. Every page has a "Back" button.
 
 ## UI notes (frontend)
 - Run: `mvn clean javafx:run` (Zulu/JDK 23 or newer). The first build needs internet access to download the Ikonli icon libraries (`ikonli-javafx`, `ikonli-fontawesome5-pack`).
