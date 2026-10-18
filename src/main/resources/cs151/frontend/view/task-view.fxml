@@ -184,6 +184,7 @@
                                     styleClass="secondary-button"/>
 
                             <Button text="Save Task"
+                                    onAction="#saveTask"
                                     styleClass="primary-button"/>
                         </HBox>
 
