@@ -50,7 +50,20 @@
                         <FontIcon iconLiteral="fas-plus"/>
                     </graphic>
                 </Button>
+
+                <Button minWidth="-Infinity"
+                        text="View tasks"
+                        onAction="#viewTasks"
+                        styleClass="secondary-button"
+                        contentDisplay="LEFT"
+                        graphicTextGap="8.0">
+                    <graphic>
+                        <FontIcon iconLiteral="fas-list"/>
+                    </graphic>
+                </Button>
+
             </HBox>
+
 
             <VBox styleClass="card" style="-fx-padding: 0;">
                 <TableView fx:id="milestonesTable" fixedCellSize="66.0">
