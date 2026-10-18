@@ -7,6 +7,7 @@ import cs151.backend.model.Milestone;
 import cs151.frontend.controller.MilestoneController;
 import cs151.frontend.controller.MilestoneListController;
 import cs151.frontend.controller.TaskController;
+import cs151.frontend.controller.TaskListController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import cs151.frontend.Motion;
@@ -22,6 +23,7 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+
 
 /**
  * Entry point of the Personal Goal Planner. Opens the window with the Home page and provides the static
@@ -215,14 +217,38 @@ public class Main extends Application {
         controller.setGoal(goal);
     }
     /** Opens the Task page for the selected milestone. */
-    public static void showTaskPage(Milestone milestone) throws IOException {
+    public static void showTaskPage(Milestone milestone)
+            throws IOException {
+
         homeActive = false;
         breadcrumb = "Goals  ›  Milestones  ›  New Task";
 
-        FXMLLoader loader = createLoader("task-view.fxml");
+        FXMLLoader loader =
+                createLoader("task-view.fxml");
+
         setPage(loader.load());
 
-        TaskController controller = loader.getController();
+        TaskController controller =
+                loader.getController();
+
+        controller.setMilestone(milestone);
+    }
+
+    /** Opens the Task List page for the selected milestone. */
+    public static void showTaskListPage(Milestone milestone)
+            throws IOException {
+
+        homeActive = false;
+        breadcrumb = "Goals  ›  Milestones  ›  Tasks";
+
+        FXMLLoader loader =
+                createLoader("task-list-view.fxml");
+
+        setPage(loader.load());
+
+        TaskListController controller =
+                loader.getController();
+
         controller.setMilestone(milestone);
     }
 
