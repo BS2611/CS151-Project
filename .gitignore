@@ -20,3 +20,8 @@ data/
 
 # Logs
 *.log
+
+# Local assistant / editor settings
+.claude/
+.vscode/
+UI_STYLE_GUIDE.md

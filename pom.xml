@@ -32,6 +32,16 @@
             </exclusions>
         </dependency>
         <dependency>
+            <groupId>org.kordamp.ikonli</groupId>
+            <artifactId>ikonli-javafx</artifactId>
+            <version>12.4.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.kordamp.ikonli</groupId>
+            <artifactId>ikonli-fontawesome5-pack</artifactId>
+            <version>12.4.0</version>
+        </dependency>
+        <dependency>
             <groupId>org.xerial</groupId>
             <artifactId>sqlite-jdbc</artifactId>
             <version>3.50.3.0</version>
@@ -83,7 +93,8 @@
                             <stripDebug>true</stripDebug>
                             <noHeaderFiles>true</noHeaderFiles>
                             <options>
-                                <option>--enable-native-access=javafx.graphics</option>
+                                <option>--enable-native-access=javafx.graphics,cs151.application,ALL-UNNAMED</option>
+                                <option>-Dprism.lcdtext=false</option>
                             </options>
                         </configuration>
                     </execution>

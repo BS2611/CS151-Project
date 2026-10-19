@@ -44,9 +44,9 @@ class MilestoneTaskProgressTest extends BackendTestBase {
         assertDoesNotThrow(() -> newMilestone(newGoal("G2"), "M"));
     }
 
-    /** v0.5: a goal's milestones are listed with the latest target date on top. */
+    /** v0.6: a goal's milestones are listed with the soonest target date on top. */
     @Test
-    void milestonesListedLatestTargetDateFirst() {
+    void milestonesListedSoonestTargetDateFirst() {
         Goal g = newGoal("G");
         planner.createMilestone(g.getId(), "Early", today.plusDays(5), null);
         planner.createMilestone(g.getId(), "Late", today.plusDays(20), null);
@@ -54,7 +54,7 @@ class MilestoneTaskProgressTest extends BackendTestBase {
 
         List<String> names = planner.getMilestonesForGoal(g.getId()).stream()
                 .map(Milestone::getMilestoneName).toList();
-        assertEquals(List.of("Late", "Middle", "Early"), names);
+        assertEquals(List.of("Early", "Middle", "Late"), names);
     }
 
     /** v0.5: a saved milestone is linked to its goal and only listed under that goal. */

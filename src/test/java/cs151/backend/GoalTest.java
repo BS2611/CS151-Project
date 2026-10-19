@@ -30,15 +30,15 @@ class GoalTest extends BackendTestBase {
         assertEquals(0, g.getProgress());
     }
 
-    /** v0.5: goals are listed with the latest target date on top. */
+    /** v0.6: goals are listed with the soonest target date on top. */
     @Test
-    void goalsListedLatestTargetDateFirst() {
+    void goalsListedSoonestTargetDateFirst() {
         planner.createGoal("Soon", "", "Other", today.plusDays(5));
         planner.createGoal("Far", "", "Other", today.plusDays(60));
         planner.createGoal("Mid", "", "Other", today.plusDays(20));
 
         List<String> names = planner.getAllGoals().stream().map(Goal::getName).toList();
-        assertEquals(List.of("Far", "Mid", "Soon"), names);
+        assertEquals(List.of("Soon", "Mid", "Far"), names);
     }
 
     @Test

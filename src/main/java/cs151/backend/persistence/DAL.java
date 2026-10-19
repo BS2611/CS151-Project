@@ -12,7 +12,7 @@ public interface DAL {
     /** Stores a new goal, sets its generated id and returns the id. */
     long insertGoal(Goal goal);
 
-    /** Returns all goals (the SQLite implementation sorts them by target date, latest first). */
+    /** Returns all goals (the SQLite implementation sorts them by target date, soonest first). */
     List<Goal> getAllGoals();
 
     /** Saves the changes of an existing goal; returns whether a goal was updated. */

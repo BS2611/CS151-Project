@@ -49,6 +49,18 @@ public class GoalController {
     private Label feedbackLabel;
 
     @FXML
+    private Label pageTitle;
+
+    @FXML
+    private javafx.scene.control.Button backLink;
+
+    @FXML
+    private javafx.scene.control.Button createGoalButton;
+
+    /** The goal being edited, or null while the page creates a new goal. */
+    private Goal editingGoal;
+
+    @FXML
     private void initialize() {
         categoryComboBox.setItems(
                 FXCollections.observableArrayList(Goal.CATEGORIES)
@@ -61,6 +73,21 @@ public class GoalController {
         progressField.setText("0");
         statusComboBox.setValue(Goal.STATUS_NOT_STARTED);
         creationDateField.setText(LocalDate.now().toString());
+    }
+
+    /** Called by Main when the page is opened from the Actions menu: fills the form with the goal and edits it. */
+    public void setGoal(Goal goal) {
+        editingGoal = goal;
+        pageTitle.setText("Edit goal");
+        backLink.setText("Back to Goals");
+        createGoalButton.setText("Save changes");
+        goalNameField.setText(goal.getName());
+        descriptionArea.setText(goal.getDescription());
+        categoryComboBox.setValue(goal.getCategory());
+        targetDatePicker.setValue(goal.getTargetDate());
+        statusComboBox.setValue(goal.getStatus());
+        progressField.setText(String.valueOf(goal.getProgress()));
+        creationDateField.setText(String.valueOf(goal.getCreationDate()));
     }
 
     @FXML
@@ -81,6 +108,13 @@ public class GoalController {
         }
 
         try {
+            if (editingGoal != null) {
+                goalPlanner.updateGoal(editingGoal.getId(), goalName, description, category, targetDate, status, progress);
+                cs151.frontend.Motion.toast("Goal updated successfully", false);
+                Main.showGoalListPage();
+                return;
+            }
+
             goalPlanner.createGoal(
                     goalName,
                     description,
@@ -92,9 +126,12 @@ public class GoalController {
 
             feedbackLabel.setStyle("-fx-text-fill: #2E7D32;");
             feedbackLabel.setText("Goal created successfully.");
+            cs151.frontend.Motion.toast("Goal created successfully", false);
 
             clearForm();
 
+        } catch (java.io.IOException exception) {
+            showError("Could not open the goal list.");
         } catch (ValidationException | PersistenceException exception) {
             // Business-rule violations and failed database operations are both shown to the user.
             showError(exception.getMessage());
@@ -118,6 +155,10 @@ public class GoalController {
 
     @FXML
     private void goBack() throws IOException {
+        if (editingGoal != null) {
+            Main.showGoalListPage();
+            return;
+        }
         Main.showHomePage();
     }
 }
