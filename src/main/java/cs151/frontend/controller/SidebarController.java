@@ -28,14 +28,10 @@ public class SidebarController {
     private void initialize() {
         (Main.isHomeActive() ? homeNav : goalsNav).getStyleClass().add("nav-item-active");
 
-        // macOS: red / yellow / green traffic lights at the top left, and the sidebar top moves the window.
-        if (WindowChrome.isMac()) {
-            trafficLights.setVisible(true);
-            trafficLights.setManaged(true);
-        }
-        if (Main.getChrome() != null) {
+        // macOS uses the real system title bar with its own traffic lights, so nothing is drawn here for it.
+        // (The custom traffic lights are kept hidden; they only exist for a frameless window.)
+        if (Main.getChrome() != null && !WindowChrome.isMac()) {
             Main.getChrome().makeDraggable(brandRow);
-            Main.getChrome().makeDraggable(trafficLights);
         }
     }
 

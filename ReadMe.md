@@ -48,8 +48,8 @@ How to use: On the Home page click "List Goals" (goals are sorted by Target Date
 - Icons: Ikonli with FontAwesome 5 only (`<FontIcon iconLiteral="fas-home"/>` in FXML). Do not add emoji or image icons.
 - Font: Inter is bundled in `src/main/resources/cs151/frontend/fonts/` (license included), so it does not need to be installed on the computer.
 - Pages: each page is one FXML file in `src/main/resources/cs151/frontend/view/` with the shared `sidebar-view.fxml` and `topbar-view.fxml`; the shared helpers are `Motion` (animations, toasts), `WindowChrome` and `WinFrame` (frameless window) in `src/main/java/cs151/frontend/`.
-- Window: the title bar is our own. On Windows the native frame hook gives Aero Snap (drag to an edge, Win+Arrow) and the Windows 11 snap layouts over the maximize button; if the hook cannot start, the app falls back to a Java-only move/resize. On macOS the red/yellow/green buttons are drawn at the top left of the sidebar.
+- Window: on Windows (and Linux) the title bar is our own. On Windows the native frame hook gives Aero Snap (drag to an edge, Win+Arrow) and the Windows 11 snap layouts over the maximize button; if the hook cannot start, the app falls back to a Java-only move/resize. On macOS the normal system title bar is used (red/yellow/green buttons, window tiling via the green button or by dragging to a screen edge, full screen and resizing all work natively).
 - Goals page: search, status, sort and category filters work on the stored goals; the "..." Actions menu offers View details, Edit goal, Milestones and Delete goal (with a confirmation). Deleting a goal also deletes its milestones.
-- Preview the macOS layout on another system with the JVM option `-Dcs151.fakeMac=true`.
+- `-Dcs151.fakeMac=true` makes another system hide our custom window buttons like on macOS (the real macOS title bar itself can only be seen on a Mac).
 
 Thank You!
