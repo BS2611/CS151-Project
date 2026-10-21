@@ -116,9 +116,7 @@
                             </HBox>
 
                             <TextField fx:id="descriptionField"
-                                      promptText="Describe the work to complete"
-                                      prefRowCount="4"
-                                      wrapText="true"/>
+                                      promptText="Describe the work to complete"/>
 
                             <Label text="Enter a clear description for this task."
                                    styleClass="helper-text"/>
