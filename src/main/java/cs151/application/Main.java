@@ -4,6 +4,8 @@ import cs151.backend.model.Goal;
 import cs151.backend.service.GoalPlanner;
 import cs151.backend.service.SeedData;
 import cs151.backend.model.Milestone;
+import cs151.backend.model.Task;
+import cs151.frontend.controller.ProgressController;
 import cs151.frontend.controller.MilestoneController;
 import cs151.frontend.controller.MilestoneListController;
 import cs151.frontend.controller.TaskController;
@@ -257,6 +259,24 @@ public class Main extends Application {
                 loader.getController();
 
         controller.setMilestone(milestone);
+    }
+
+    /** Shows the Progress page (add a progress note) for the given task. */
+    public static void showProgressPage(Task task)
+            throws IOException {
+
+        homeActive = false;
+        breadcrumb = "Goals  ›  Milestones  ›  Tasks  ›  New Progress";
+
+        FXMLLoader loader =
+                createLoader("progress-view.fxml");
+
+        setPage(loader.load());
+
+        ProgressController controller =
+                loader.getController();
+
+        controller.setTask(task);
     }
 
     private static FXMLLoader createLoader(String fileName) {

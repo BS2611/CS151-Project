@@ -5,11 +5,13 @@ import cs151.backend.model.Goal;
 import cs151.backend.model.Milestone;
 import cs151.backend.model.Task;
 import cs151.backend.service.GoalPlanner;
+import cs151.frontend.Motion;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 
 import java.io.IOException;
@@ -61,6 +63,21 @@ public class TaskListController {
 
         tasksTable.setPlaceholder(
                 new Label("This milestone has no tasks yet."));
+
+        // Double-clicking a task row opens the Progress page for that task.
+        tasksTable.setRowFactory(table -> {
+            TableRow<Task> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && !row.isEmpty()) {
+                    try {
+                        Main.showProgressPage(row.getItem());
+                    } catch (IOException exception) {
+                        Motion.toast("Could not open the progress page.", true);
+                    }
+                }
+            });
+            return row;
+        });
     }
 
     public void setMilestone(Milestone milestone) {
