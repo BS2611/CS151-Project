@@ -51,9 +51,16 @@
                                styleClass="page-title"/>
 
                         <Label fx:id="subtitleLabel"
-                               text="Tasks sorted by target date"
+                               text="Tasks sorted by due date, ascending"
                                styleClass="page-subtitle"/>
                     </VBox>
+                    <!-- Opens the progress history for the selected task. -->
+                    <HBox alignment="CENTER_RIGHT" spacing="10.0">
+                        <Button minWidth="-Infinity"
+                                text="View Progress"
+                                onAction="#viewProgress"
+                                styleClass="secondary-button"/>
+                    </HBox>
 
                     <VBox styleClass="card"
                           style="-fx-padding: 0;">

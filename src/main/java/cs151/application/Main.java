@@ -6,6 +6,7 @@ import cs151.backend.service.SeedData;
 import cs151.backend.model.Milestone;
 import cs151.backend.model.Task;
 import cs151.frontend.controller.ProgressController;
+import cs151.frontend.controller.ProgressListController;
 import cs151.frontend.controller.MilestoneController;
 import cs151.frontend.controller.MilestoneListController;
 import cs151.frontend.controller.TaskController;
@@ -274,6 +275,27 @@ public class Main extends Application {
         setPage(loader.load());
 
         ProgressController controller =
+                loader.getController();
+
+        controller.setTask(task);
+    }
+
+    /**
+     * Shows all stored progress entries for the selected task.
+     */
+    public static void showProgressListPage(Task task)
+            throws IOException {
+
+        homeActive = false;
+        breadcrumb =
+                "Goals  ›  Milestones  ›  Tasks  ›  Progress History";
+
+        FXMLLoader loader =
+                createLoader("progress-list-view.fxml");
+
+        setPage(loader.load());
+
+        ProgressListController controller =
                 loader.getController();
 
         controller.setTask(task);

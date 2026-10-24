@@ -86,12 +86,31 @@ public class TaskListController {
         titleLabel.setText(milestone.getMilestoneName());
 
         subtitleLabel.setText(
-                "Tasks sorted by target date");
+                "Tasks sorted by due date, ascending");
 
         tasksTable.setItems(
                 FXCollections.observableArrayList(
                         goalPlanner.getTasksForMilestone(
                                 milestone.getId())));
+    }
+    /**
+     * Opens the stored progress entries for the selected task.
+     */
+    @FXML
+    private void viewProgress() {
+        Task selectedTask =
+                tasksTable.getSelectionModel().getSelectedItem();
+
+        if (selectedTask == null) {
+            Motion.toast("Please select a task first.", true);
+            return;
+        }
+
+        try {
+            Main.showProgressListPage(selectedTask);
+        } catch (IOException exception) {
+            Motion.toast("Could not open the progress list.", true);
+        }
     }
 
     @FXML
