@@ -5,7 +5,7 @@
 # Version 0.7
 1. Bhavpreet Singh: Implemented the Progress page UI with Entry Date and Note fields, connected the Save button to the backend with validation toasts, added double-click navigation from the Task List page, added a Back button and populated each of the 9 milestones with 2 meaningful tasks
 2. Sujata Giri: Added the View Progress button and Progress List page using a JavaFX TableView sorted by Entry Date ascending, added a Back button and sorted Tasks by Due Date ascending
-3. Keerat Kaur: Added tests for saving Progress entries, Task and Progress sorting, updated the README, cleaned the project folder and create the final ZIP.
+3. Keerat Kaur: Added tests for saving Progress entries, Task and Progress sorting, updated the README, cleaned the project folder and created the final ZIP.
    
 # Version 0.6
 1. Sujata Giri: Created the Task page UI (Description, Due Date, Priority, Status) and added the Create Task button to the Milestone list page
