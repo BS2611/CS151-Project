@@ -3,10 +3,10 @@
 # Who did What
 
 # Version 0.7
-1. Bhavpreet Singh: Implemented the Progress page with Entry Date and Note fields, connected Save to the backend with validation toasts, added double-click navigation from the Task List page, added a Back button, and populated each of the 9 milestones with 2 meaningful tasks
-2. Sujata Giri: Added the View Progress button and Progress List page using a JavaFX TableView sorted by Entry Date ascending, added a Back button, and sorted Tasks by Due Date ascending
-3. Keerat Kaur: Added tests for saving Progress, Task and Progress sorting, and the required seed data; updated this README; cleaned the project folder; and will create the final ZIP after all changes are merged
-
+1. Bhavpreet Singh: Implemented the Progress page UI with Entry Date and Note fields, connected the Save button to the backend with validation toasts, added double-click navigation from the Task List page, added a Back button and populated each of the 9 milestones with 2 meaningful tasks
+2. Sujata Giri: Added the View Progress button and Progress List page using a JavaFX TableView sorted by Entry Date ascending, added a Back button and sorted Tasks by Due Date ascending
+3. Keerat Kaur: Added tests for saving Progress entries, Task and Progress sorting, updated the README, cleaned the project folder and create the final ZIP.
+   
 # Version 0.6
 1. Sujata Giri: Created the Task page UI (Description, Due Date, Priority, Status) and added the Create Task button to the Milestone list page
 2. Bhavpreet Singh: Backend - saved Tasks permanently in SQLite and connected each Task to its associated Milestone (Save Task button), populated 3 Goals with 3 Milestones each, and sorted Goals and Milestones by Target Date ascending
