@@ -27,6 +27,26 @@ class SeedAndTaskSaveTest extends BackendTestBase {
         }
     }
 
+    /** v0.7: every one of the nine seeded milestones has exactly two tasks. */
+    @Test
+    void seedCreatesTwoTasksForEachMilestone() {
+        SeedData.seedIfEmpty(planner);
+
+        int milestoneCount = 0;
+        int taskCount = 0;
+        for (Goal goal : planner.getAllGoals()) {
+            for (Milestone milestone : planner.getMilestonesForGoal(goal.getId())) {
+                milestoneCount++;
+                assertEquals(2, planner.getTasksForMilestone(milestone.getId()).size(),
+                        "Each seeded milestone should contain exactly two tasks.");
+                taskCount += planner.getTasksForMilestone(milestone.getId()).size();
+            }
+        }
+
+        assertEquals(9, milestoneCount);
+        assertEquals(18, taskCount);
+    }
+
     @Test
     void seedingTwiceDoesNotCreateDuplicates() {
         SeedData.seedIfEmpty(planner);
