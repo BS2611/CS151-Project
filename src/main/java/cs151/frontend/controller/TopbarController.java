@@ -62,11 +62,11 @@ public class TopbarController {
 
         // The top bar is the drag handle of the frameless window (nothing happens when there is no window yet).
         WindowChrome chrome = Main.getChrome();
-        if (chrome != null) {
+        if (chrome != null && !WindowChrome.isMac()) {
             chrome.makeDraggable(topbar);
         }
 
-        // macOS draws its own traffic lights in the sidebar, so the Windows-style buttons are hidden there.
+        // macOS has its own title bar with traffic lights, so the Windows-style buttons are hidden there.
         boolean mac = WindowChrome.isMac();
         windowButtons.setVisible(!mac);
         windowButtons.setManaged(!mac);

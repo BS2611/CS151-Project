@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<HBox styleClass="app-shell"
+      xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="cs151.frontend.controller.ProgressController">
+
+    <fx:include source="sidebar-view.fxml"/>
+
+    <VBox HBox.hgrow="ALWAYS" minWidth="0.0">
+
+        <fx:include source="topbar-view.fxml"/>
+
+        <ScrollPane styleClass="content-scroll"
+                    fitToWidth="true"
+                    hbarPolicy="NEVER"
+                    VBox.vgrow="ALWAYS">
+
+            <HBox alignment="TOP_CENTER" minWidth="0.0">
+
+                <VBox styleClass="page"
+                      HBox.hgrow="ALWAYS"
+                      maxWidth="1400.0"
+                      minWidth="0.0">
+
+                    <!-- Back to the Task list of the same milestone -->
+                    <Button text="Back to Tasks"
+                            onAction="#goBack"
+                            styleClass="back-link"
+                            contentDisplay="LEFT"
+                            graphicTextGap="8.0">
+
+                        <graphic>
+                            <FontIcon iconLiteral="fas-arrow-left"/>
+                        </graphic>
+                    </Button>
+
+                    <VBox spacing="6.0">
+                        <Label text="Add a progress note"
+                               styleClass="page-title"/>
+
+                        <Label text="Record work completed, obstacles or next steps for a task. Fields marked with * are required."
+                               styleClass="page-subtitle"
+                               wrapText="true"/>
+                    </VBox>
+
+                    <!-- Summary card: the task that was opened and its milestone -->
+                    <HBox styleClass="card, card-accent"
+                          alignment="CENTER_LEFT"
+                          spacing="24.0">
+
+                        <VBox spacing="6.0"
+                              HBox.hgrow="ALWAYS">
+
+                            <HBox spacing="10.0"
+                                  alignment="CENTER_LEFT">
+
+                                <Label text="TASK"
+                                       styleClass="pill, pill-neutral"/>
+
+                                <Label text="PARENT TASK"
+                                       styleClass="eyebrow"/>
+                            </HBox>
+
+                            <Label fx:id="summaryName"
+                                   text="No task selected"
+                                   styleClass="section-title"
+                                   style="-fx-font-size: 20px;"
+                                   wrapText="true"/>
+
+                            <Label fx:id="summaryDeadline"
+                                   text=""
+                                   styleClass="helper-text"
+                                   wrapText="true"/>
+                        </VBox>
+
+                        <VBox spacing="6.0"
+                              minWidth="250.0"
+                              prefWidth="250.0"
+                              alignment="CENTER_LEFT">
+
+                            <Label text="PROGRESS INFORMATION"
+                                   styleClass="eyebrow"/>
+
+                            <Label fx:id="summaryHint"
+                                   text=""
+                                   styleClass="helper-text"
+                                   wrapText="true"/>
+                        </VBox>
+                    </HBox>
+
+                    <!-- Form card -->
+                    <VBox styleClass="card"
+                          style="-fx-padding: 24 24 0 24;">
+
+                        <Label text="Progress Details"
+                               styleClass="section-title"/>
+
+                        <Pane styleClass="divider"/>
+
+                        <!-- Task: drop-down with the tasks of the same milestone -->
+                        <VBox spacing="6.0">
+
+                            <HBox spacing="3.0">
+                                <Label text="Task"
+                                       styleClass="field-label"/>
+                                <Label text="*"
+                                       styleClass="required-star"/>
+                            </HBox>
+
+                            <ComboBox fx:id="taskComboBox"
+                                      promptText="Select a task"
+                                      maxWidth="Infinity"/>
+
+                            <Label text="Choose the task this note belongs to."
+                                   styleClass="helper-text"/>
+                        </VBox>
+
+                        <!-- Entry date: generated automatically, so it is shown read-only -->
+                        <VBox spacing="6.0">
+
+                            <Label text="Entry Date"
+                                   styleClass="field-label"/>
+
+                            <TextField fx:id="entryDateField"
+                                       editable="false"
+                                       focusTraversable="false"
+                                       maxWidth="250.0"/>
+
+                            <Label text="Set automatically to today's date."
+                                   styleClass="helper-text"/>
+                        </VBox>
+
+                        <!-- Progress note: text area -->
+                        <VBox spacing="6.0">
+
+                            <HBox spacing="3.0">
+                                <Label text="Progress Note"
+                                       styleClass="field-label"/>
+                                <Label text="*"
+                                       styleClass="required-star"/>
+                            </HBox>
+
+                            <TextArea fx:id="noteArea"
+                                      promptText="Describe work completed, obstacles or next steps"
+                                      prefRowCount="4"
+                                      wrapText="true"/>
+
+                            <Label text="Write what was done, what is blocking you, or what comes next."
+                                   styleClass="helper-text"/>
+                        </VBox>
+
+                        <HBox styleClass="card-footer"
+                              alignment="CENTER_RIGHT"
+                              spacing="12.0">
+
+                            <VBox.margin>
+                                <Insets left="-24"
+                                        right="-24"/>
+                            </VBox.margin>
+
+                            <Button text="Cancel"
+                                    minWidth="-Infinity"
+                                    onAction="#goBack"
+                                    styleClass="secondary-button"/>
+
+                            <Button text="Save Progress"
+                                    minWidth="-Infinity"
+                                    onAction="#saveProgress"
+                                    styleClass="primary-button"/>
+                        </HBox>
+
+                    </VBox>
+
+                </VBox>
+
+            </HBox>
+
+        </ScrollPane>
+
+    </VBox>
+
+</HBox>

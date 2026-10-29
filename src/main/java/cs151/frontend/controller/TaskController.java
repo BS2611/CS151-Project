@@ -10,10 +10,7 @@ import cs151.backend.service.GoalPlanner;
 import cs151.frontend.Motion;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.*;
 
 import java.io.IOException;
 
@@ -33,7 +30,7 @@ public class TaskController {
     private Label summaryHint;
 
     @FXML
-    private TextArea descriptionField;
+    private TextField descriptionField;
 
     @FXML
     private DatePicker dueDatePicker;

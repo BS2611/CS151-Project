@@ -46,8 +46,8 @@ public final class WindowChrome {
     }
 
     /**
-     * On Windows the native frame hook ({@link WinFrame}) handles moving, resizing and snapping, so the
-     * Java-only versions below must stay out of the way.
+     * On Windows the native frame hook ({@link WinFrame}) handles moving, resizing and snapping, and on macOS the
+     * system window frame does, so the Java-only versions below must stay out of the way.
      */
     public void useNativeFrame() {
         nativeFrame = true;
@@ -58,12 +58,14 @@ public final class WindowChrome {
     }
 
     public boolean isMaximized() {
-        return nativeFrame ? WinFrame.isMaximized() : maximized;
+        return nativeFrame ? (!isMac() && WinFrame.isMaximized()) : maximized;
     }
 
     public void toggleMaximize() {
         if (nativeFrame) {
-            WinFrame.toggleMaximize();
+            if (!isMac()) {
+                WinFrame.toggleMaximize();
+            }
             return;
         }
         if (maximized) {

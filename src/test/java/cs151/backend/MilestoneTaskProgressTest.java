@@ -8,6 +8,9 @@ import cs151.backend.model.ProgressEntry;
 import cs151.backend.model.Task;
 import org.junit.jupiter.api.Test;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -154,6 +157,19 @@ class MilestoneTaskProgressTest extends BackendTestBase {
         assertThrows(ValidationException.class, () -> planner.createTask(m.getId(), "T", today, "Urgent", null));
     }
 
+    /** v0.7: tasks are listed with the soonest due date first. */
+    @Test
+    void tasksListedSoonestDueDateFirst() {
+        Milestone m = newMilestone(newGoal("G"), "M");
+        planner.createTask(m.getId(), "Late", today.plusDays(8), null, null);
+        planner.createTask(m.getId(), "Early", today.plusDays(2), null, null);
+        planner.createTask(m.getId(), "Middle", today.plusDays(5), null, null);
+
+        List<String> descriptions = planner.getTasksForMilestone(m.getId()).stream()
+                .map(Task::getDescription).toList();
+        assertEquals(List.of("Early", "Middle", "Late"), descriptions);
+    }
+
     // ---------------- progress entries
 
     @Test
@@ -181,5 +197,30 @@ class MilestoneTaskProgressTest extends BackendTestBase {
         assertEquals("two", planner.getProgressEntriesForTask(t.getId()).get(0).getNote());
         planner.deleteProgressEntry(e.getId());
         assertTrue(planner.getProgressEntriesForTask(t.getId()).isEmpty());
+    }
+
+    /** v0.7: progress history is listed by entry date in ascending order. */
+    @Test
+    void progressEntriesListedByEntryDateAscending() throws Exception {
+        Task t = newTask(newMilestone(newGoal("G"), "M"), "T");
+        ProgressEntry first = planner.addProgressEntry(t.getId(), "first");
+        ProgressEntry second = planner.addProgressEntry(t.getId(), "second");
+
+        // The application creates entries with today's date. Move the test rows to
+        // different dates so the required ordering is independently verified.
+        try (Connection connection = DriverManager.getConnection("jdbc:sqlite:" + dbPath);
+             PreparedStatement statement = connection.prepareStatement(
+                     "UPDATE progress_entries SET entry_date = ? WHERE id = ?")) {
+            statement.setString(1, today.plusDays(2).toString());
+            statement.setLong(2, first.getId());
+            statement.executeUpdate();
+            statement.setString(1, today.minusDays(1).toString());
+            statement.setLong(2, second.getId());
+            statement.executeUpdate();
+        }
+
+        List<String> notes = planner.getProgressEntriesForTask(t.getId()).stream()
+                .map(ProgressEntry::getNote).toList();
+        assertEquals(List.of("second", "first"), notes);
     }
 }

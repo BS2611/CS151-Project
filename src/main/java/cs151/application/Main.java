@@ -4,6 +4,9 @@ import cs151.backend.model.Goal;
 import cs151.backend.service.GoalPlanner;
 import cs151.backend.service.SeedData;
 import cs151.backend.model.Milestone;
+import cs151.backend.model.Task;
+import cs151.frontend.controller.ProgressController;
+import cs151.frontend.controller.ProgressListController;
 import cs151.frontend.controller.MilestoneController;
 import cs151.frontend.controller.MilestoneListController;
 import cs151.frontend.controller.TaskController;
@@ -19,6 +22,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.StageStyle;
 import javafx.scene.Scene;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
@@ -54,12 +58,16 @@ public class Main extends Application {
         SeedData.seedIfEmpty(new GoalPlanner());
 
         stage = primaryStage;
-        stage.initStyle(StageStyle.UNDECORATED);
+        // Windows/Linux: frameless window with our own buttons. macOS: the normal macOS window frame (UNIFIED:
+        // title bar blended with the page), so the real traffic lights, window tiling/snap (hover the green
+        // button or drag to an edge), full screen and resizing all work natively.
+        stage.initStyle(WindowChrome.isMac() ? StageStyle.UNIFIED : StageStyle.UNDECORATED);
 
         scene = new Scene(createShell(), 1280, 800);
         scene.getStylesheets().add(
                 Main.class.getResource("/cs151/frontend/css/application.css").toExternalForm()
         );
+        scene.setFill(Color.web("#FFFFFF"));
         Motion.install(scene);
 
         chrome = new WindowChrome(stage);
@@ -71,7 +79,9 @@ public class Main extends Application {
         stage.show();
 
         // Windows: give the frameless window native snap/resize/drag; otherwise move and resize it from Java.
-        if (WinFrame.install(stage)) {
+        if (WindowChrome.isMac()) {
+            chrome.useNativeFrame();
+        } else if (WinFrame.install(stage)) {
             chrome.useNativeFrame();
         } else {
             chrome.installResize(scene);
@@ -250,6 +260,45 @@ public class Main extends Application {
                 loader.getController();
 
         controller.setMilestone(milestone);
+    }
+
+    /** Shows the Progress page (add a progress note) for the given task. */
+    public static void showProgressPage(Task task)
+            throws IOException {
+
+        homeActive = false;
+        breadcrumb = "Goals  ›  Milestones  ›  Tasks  ›  New Progress";
+
+        FXMLLoader loader =
+                createLoader("progress-view.fxml");
+
+        setPage(loader.load());
+
+        ProgressController controller =
+                loader.getController();
+
+        controller.setTask(task);
+    }
+
+    /**
+     * Shows all stored progress entries for the selected task.
+     */
+    public static void showProgressListPage(Task task)
+            throws IOException {
+
+        homeActive = false;
+        breadcrumb =
+                "Goals  ›  Milestones  ›  Tasks  ›  Progress History";
+
+        FXMLLoader loader =
+                createLoader("progress-list-view.fxml");
+
+        setPage(loader.load());
+
+        ProgressListController controller =
+                loader.getController();
+
+        controller.setTask(task);
     }
 
     private static FXMLLoader createLoader(String fileName) {
