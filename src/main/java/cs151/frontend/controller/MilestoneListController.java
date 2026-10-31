@@ -1,149 +1,103 @@
-package cs151.frontend.controller;
+<?xml version="1.0" encoding="UTF-8"?>
 
-import cs151.application.Main;
-import cs151.backend.model.Goal;
-import cs151.backend.model.Milestone;
-import cs151.backend.service.GoalPlanner;
-import cs151.frontend.Motion;
-import javafx.beans.property.ReadOnlyStringWrapper;
-import javafx.collections.FXCollections;
-import javafx.fxml.FXML;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
-import java.io.IOException;
-import java.time.LocalDate;
+<HBox styleClass="app-shell"
+      xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="cs151.frontend.controller.MilestoneListController">
 
-/**
- * Controller of the Milestone List page (milestone-list-view.fxml). Shows all stored milestones of one goal in a
- * TableView; the backend already returns them with the soonest target date first.
- */
-public class MilestoneListController {
+    <fx:include source="sidebar-view.fxml"/>
 
-    private final GoalPlanner goalPlanner = new GoalPlanner();
+    <VBox HBox.hgrow="ALWAYS" minWidth="0.0">
+        <fx:include source="topbar-view.fxml"/>
+        <ScrollPane styleClass="content-scroll" fitToWidth="true" hbarPolicy="NEVER" VBox.vgrow="ALWAYS">
+        <HBox alignment="TOP_CENTER" minWidth="0.0">
+        <VBox styleClass="page" HBox.hgrow="ALWAYS" maxWidth="1400.0" minWidth="0.0">
 
-    private Goal goal;
+            <Button text="Back to Goals" onAction="#goBack" styleClass="back-link" contentDisplay="LEFT" graphicTextGap="8.0">
+                <graphic><FontIcon iconLiteral="fas-arrow-left"/></graphic>
+            </Button>
 
-    @FXML
-    private Label titleLabel;
+            <HBox alignment="BOTTOM_LEFT" spacing="12.0">
+                <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                    <Label text="GOALS / MILESTONES" styleClass="eyebrow"/>
+                    <Label fx:id="titleLabel" text="Milestones" styleClass="page-title" wrapText="true" maxWidth="Infinity"/>
+                    <Label fx:id="subtitleLabel" text="" styleClass="page-subtitle" wrapText="true"/>
+                </VBox>
+                <Button minWidth="-Infinity" text="Refresh" onAction="#refreshClicked" styleClass="secondary-button" contentDisplay="LEFT" graphicTextGap="8.0">
+                    <graphic><FontIcon fx:id="refreshIcon" iconLiteral="fas-sync-alt"/></graphic>
+                </Button>
+                <Button minWidth="-Infinity" text="Create milestone" onAction="#createMilestone" styleClass="primary-button" contentDisplay="LEFT" graphicTextGap="8.0">
+                    <graphic><FontIcon iconLiteral="fas-plus"/></graphic>
+                </Button>
+                <Button minWidth="-Infinity"
+                        text="Create task"
+                        onAction="#createTask"
+                        styleClass="secondary-button"
+                        contentDisplay="LEFT"
+                        graphicTextGap="8.0">
 
-    @FXML
-    private javafx.scene.Node refreshIcon;
+                    <graphic>
+                        <FontIcon iconLiteral="fas-plus"/>
+                    </graphic>
+                </Button>
 
-    @FXML
-    private Label subtitleLabel;
+                <Button minWidth="-Infinity"
+                        text="View tasks"
+                        onAction="#viewTasks"
+                        styleClass="secondary-button"
+                        contentDisplay="LEFT"
+                        graphicTextGap="8.0">
+                    <graphic>
+                        <FontIcon iconLiteral="fas-list"/>
+                    </graphic>
+                </Button>
+                <Button minWidth="-Infinity"
+                        text="Edit"
+                        onAction="#editMilestone"
+                        styleClass="secondary-button"
+                        contentDisplay="LEFT"
+                        graphicTextGap="8.0">
+                    <graphic>
+                        <FontIcon iconLiteral="fas-edit"/>
+                    </graphic>
+                </Button>
 
-    @FXML
-    private TableView<Milestone> milestonesTable;
+                <Button minWidth="-Infinity"
+                        text="Delete"
+                        onAction="#deleteMilestone"
+                        styleClass="secondary-button"
+                        contentDisplay="LEFT"
+                        graphicTextGap="8.0">
+                    <graphic>
+                        <FontIcon iconLiteral="fas-trash"/>
+                    </graphic>
+                </Button>
+            </HBox>
 
-    @FXML
-    private TableColumn<Milestone, String> nameColumn;
 
-    @FXML
-    private TableColumn<Milestone, String> targetDateColumn;
+            <VBox styleClass="card" style="-fx-padding: 0;">
+                <TableView fx:id="milestonesTable" fixedCellSize="66.0">
+                    <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/></columnResizePolicy>
+                    <columns>
+                        <TableColumn fx:id="nameColumn" text="Milestone" prefWidth="360.0"/>
+                        <TableColumn fx:id="targetDateColumn" text="Target Date" prefWidth="160.0"/>
+                        <TableColumn fx:id="statusColumn" text="Status" prefWidth="160.0"/>
+                    </columns>
+                </TableView>
+            </VBox>
 
-    @FXML
-    private TableColumn<Milestone, String> statusColumn;
-
-    @FXML
-    private void initialize() {
-        nameColumn.setCellValueFactory(
-                cell -> new ReadOnlyStringWrapper(cell.getValue().getMilestoneName())
-        );
-
-        targetDateColumn.setCellValueFactory(
-                cell -> new ReadOnlyStringWrapper(formatDate(cell.getValue().getTargetDate()))
-        );
-
-        statusColumn.setCellValueFactory(
-                cell -> new ReadOnlyStringWrapper(cell.getValue().getStatus())
-        );
-
-        statusColumn.setCellFactory(column -> new TableCell<>() {
-            @Override
-            protected void updateItem(String status, boolean empty) {
-                super.updateItem(status, empty);
-                setText(null);
-                setGraphic(empty || status == null ? null : GoalListController.statusPill(status));
-            }
-        });
-
-        milestonesTable.setPlaceholder(new Label("This goal has no milestones yet."));
-    }
-
-    /** Called by Main right after the page is loaded: remembers the goal and fills the table. */
-    public void setGoal(Goal goal) {
-        this.goal = goal;
-        titleLabel.setText(goal.getName());
-        subtitleLabel.setText(goal.getCategory() + "  •  Target " + goal.getTargetDate()
-                + "  •  " + goal.getProgress() + "% complete  •  Milestones, soonest target date first");
-        refreshMilestones();
-    }
-
-    @FXML
-    private void refreshMilestones() {
-        if (goal == null) {
-            return;
-        }
-
-        milestonesTable.setItems(
-                FXCollections.observableArrayList(goalPlanner.getMilestonesForGoal(goal.getId()))
-        );
-
-        // The table is exactly as tall as its rows instead of leaving a big empty white card.
-        double height = 48 + Math.max(milestonesTable.getItems().size(), 3) * milestonesTable.getFixedCellSize();
-        milestonesTable.setMinHeight(height);
-        milestonesTable.setPrefHeight(height);
-        milestonesTable.setMaxHeight(height);
-    }
-
-    /** Refresh button: reloads the milestones with a spinning icon, a quick fade of the table and a toast. */
-    @FXML
-    private void refreshClicked() {
-        Motion.spin(refreshIcon);
-        refreshMilestones();
-        Motion.refreshFade(milestonesTable);
-        Motion.toast("Milestones refreshed", false);
-    }
-
-    @FXML
-    private void createMilestone() throws IOException {
-        Main.showMilestonePage(goal);
-    }
-
-    @FXML
-    private void createTask() throws IOException {
-        Milestone selectedMilestone =
-                milestonesTable.getSelectionModel().getSelectedItem();
-
-        if (selectedMilestone == null) {
-            Motion.toast("Please select a milestone first.", false);
-            return;
-        }
-
-        Main.showTaskPage(selectedMilestone);
-    }
-    @FXML
-    private void goBack() throws IOException {
-        Main.showGoalListPage();
-    }
-
-    @FXML
-    private void viewTasks() throws IOException {
-        Milestone selectedMilestone =
-                milestonesTable.getSelectionModel().getSelectedItem();
-
-        if (selectedMilestone == null) {
-            Motion.toast("Please select a milestone first.", false);
-            return;
-        }
-
-        Main.showTaskListPage(selectedMilestone);
-    }
-
-    private String formatDate(LocalDate date) {
-        return date == null ? "" : date.toString();
-    }
-}
+        </VBox>
+        </HBox>
+        </ScrollPane>
+    </VBox>
+</HBox>
