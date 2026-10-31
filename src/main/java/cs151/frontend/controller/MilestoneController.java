@@ -148,8 +148,7 @@ public class MilestoneController {
                 );
 
                 showSuccess("Milestone updated successfully.");
-                Main.showMilestoneListPage(goal);
-            }
+                Main.showGoalListPage();            }
         } catch (ValidationException | PersistenceException exception) {
             showError(exception.getMessage());
         }
