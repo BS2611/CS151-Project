@@ -42,8 +42,9 @@ public class GoalController {
     @FXML
     private TextField progressField;
 
+    /** Auto-generated (today) and disabled while creating a goal; editable while editing one. */
     @FXML
-    private TextField creationDateField;
+    private DatePicker creationDatePicker;
 
     @FXML
     private Label feedbackLabel;
@@ -72,7 +73,8 @@ public class GoalController {
 
         progressField.setText("0");
         statusComboBox.setValue(Goal.STATUS_NOT_STARTED);
-        creationDateField.setText(LocalDate.now().toString());
+        creationDatePicker.setValue(LocalDate.now());
+        creationDatePicker.setDisable(true);
     }
 
     /** Called by Main when the page is opened from the Actions menu: fills the form with the goal and edits it. */
@@ -87,7 +89,8 @@ public class GoalController {
         targetDatePicker.setValue(goal.getTargetDate());
         statusComboBox.setValue(goal.getStatus());
         progressField.setText(String.valueOf(goal.getProgress()));
-        creationDateField.setText(String.valueOf(goal.getCreationDate()));
+        creationDatePicker.setValue(goal.getCreationDate());
+        creationDatePicker.setDisable(false);
     }
 
     @FXML
@@ -109,7 +112,8 @@ public class GoalController {
 
         try {
             if (editingGoal != null) {
-                goalPlanner.updateGoal(editingGoal.getId(), goalName, description, category, targetDate, status, progress);
+                goalPlanner.updateGoal(editingGoal.getId(), goalName, description, category, targetDate, status, progress,
+                        creationDatePicker.getValue());
                 cs151.frontend.Motion.toast("Goal updated successfully", false);
                 Main.showGoalListPage();
                 return;
@@ -150,7 +154,7 @@ public class GoalController {
         targetDatePicker.setValue(null);
         statusComboBox.setValue(Goal.STATUS_NOT_STARTED);
         progressField.setText("0");
-        creationDateField.setText(LocalDate.now().toString());
+        creationDatePicker.setValue(LocalDate.now());
     }
 
     @FXML

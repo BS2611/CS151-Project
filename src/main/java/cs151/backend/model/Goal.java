@@ -26,7 +26,7 @@ public class Goal {
     private LocalDate targetDate;
     private String status;
     private int progress;
-    private final LocalDate creationDate;
+    private LocalDate creationDate;
 
     /** Creates a new, unsaved goal; the creation date is set to today. */
     public Goal(String name, String description, String category, LocalDate targetDate, String status, int progress) {
@@ -67,6 +67,14 @@ public class Goal {
 
     public int getProgress() { return progress; }
     public LocalDate getCreationDate() { return creationDate; }
+
+    /** Changes the creation date (v0.8: the Edit Goal page lets the user edit it). It cannot be null. */
+    public void setCreationDate(LocalDate creationDate) {
+        if (creationDate == null) {
+            throw new ValidationException("Creation date is required.");
+        }
+        this.creationDate = creationDate;
+    }
 
     /** Sets progress (0-100). A Completed goal must stay at 100. */
     public void updateProgress(int progress) {

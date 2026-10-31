@@ -488,6 +488,8 @@
 .icon-button { -fx-background-color: transparent; -fx-background-radius: 8; -fx-padding: 7 9 7 9; -fx-cursor: hand; -fx-background-insets: 0; }
 .icon-button:hover { -fx-background-color: -ds-neutral-light; }
 .icon-button .ikonli-font-icon { -fx-icon-size: 14; -fx-icon-color: -ds-text-2; }
+.icon-button-danger:hover { -fx-background-color: -ds-danger-light; }
+.icon-button-danger .ikonli-font-icon { -fx-icon-color: -ds-danger; }
 .table-cell:filled > .icon-button { -fx-alignment: center; }
 
 .context-menu.actions-menu, .actions-menu {

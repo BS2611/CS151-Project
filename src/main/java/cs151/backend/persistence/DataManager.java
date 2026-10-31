@@ -257,14 +257,15 @@ public class DataManager implements DAL {
         return write(c -> {
             try (PreparedStatement ps = c.prepareStatement(
                     "UPDATE goals SET name = ?, description = ?, category = ?, target_date = ?, status = ?, "
-                            + "progress = ? WHERE id = ?")) {
+                            + "progress = ?, creation_date = ? WHERE id = ?")) {
                 ps.setString(1, goal.getName());
                 ps.setString(2, goal.getDescription());
                 ps.setString(3, goal.getCategory());
                 ps.setString(4, str(goal.getTargetDate()));
                 ps.setString(5, goal.getStatus());
                 ps.setInt(6, goal.getProgress());
-                ps.setLong(7, goal.getId());
+                ps.setString(7, str(goal.getCreationDate()));
+                ps.setLong(8, goal.getId());
                 return ps.executeUpdate() > 0;
             }
         });

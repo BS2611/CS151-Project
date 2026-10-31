@@ -1,5 +1,6 @@
 package cs151.backend.service;
 
+import cs151.backend.dto.GoalDeletionImpact;
 import cs151.backend.dto.SearchResults;
 import cs151.backend.exception.DuplicateEntityException;
 import cs151.backend.exception.NotFoundException;
@@ -61,8 +62,23 @@ public class GoalPlanner {
      */
     public Goal updateGoal(long goalId, String name, String description, String category, LocalDate targetDate,
                            String status, int progress) {
+        return updateGoal(goalId, name, description, category, targetDate, status, progress,
+                getGoal(goalId).getCreationDate());
+    }
+
+    /**
+     * Updates a goal including its creation date (v0.8: the auto-generated date can be edited). The creation
+     * date is required and cannot be in the future.
+     */
+    public Goal updateGoal(long goalId, String name, String description, String category, LocalDate targetDate,
+                           String status, int progress, LocalDate creationDate) {
         Goal goal = getGoal(goalId);
         LocalDate oldTargetDate = goal.getTargetDate();
+        if (creationDate == null) throw new ValidationException("Creation date is required.");
+        if (creationDate.isAfter(LocalDate.now())) {
+            throw new ValidationException("Creation date cannot be in the future.");
+        }
+        goal.setCreationDate(creationDate);
         goal.setName(name);
         goal.setDescription(description);
         goal.setCategory(category);
@@ -80,6 +96,24 @@ public class GoalPlanner {
         }
         goalDal.updateGoal(goal);
         return goal;
+    }
+
+    /**
+     * Counts what deleting the goal will remove along with it (its milestones, their tasks and the progress
+     * entries of those tasks), so the delete confirmation can warn the user.
+     */
+    public GoalDeletionImpact getDeletionImpact(long goalId) {
+        int milestones = 0;
+        int tasks = 0;
+        int progresses = 0;
+        for (Milestone m : dataManager.getMilestonesForGoal(goalId)) {
+            milestones++;
+            for (Task t : dataManager.getTasksForMilestone(m.getId())) {
+                tasks++;
+                progresses += dataManager.getProgressEntriesForTask(t.getId()).size();
+            }
+        }
+        return new GoalDeletionImpact(milestones, tasks, progresses);
     }
 
     /** Deletes the goal and, by cascade, its milestones, tasks and progress entries. */
@@ -272,6 +306,18 @@ public class GoalPlanner {
     public ProgressEntry addProgressEntry(long taskId, String note) {
         getTask(taskId);
         ProgressEntry entry = new ProgressEntry(taskId, note);
+        requireNote(entry);
+        dataManager.insertProgressEntry(entry);
+        return entry;
+    }
+
+    /**
+     * Adds a note with an explicit entry date. Only used for the sample data; the application pages use
+     * {@link #addProgressEntry(long, String)}, where the date is always today.
+     */
+    public ProgressEntry addProgressEntry(long taskId, String note, LocalDate entryDate) {
+        getTask(taskId);
+        ProgressEntry entry = new ProgressEntry(0, taskId, entryDate, note);
         requireNote(entry);
         dataManager.insertProgressEntry(entry);
         return entry;

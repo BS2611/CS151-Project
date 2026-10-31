@@ -78,7 +78,7 @@
                     </VBox>
                     <VBox spacing="6.0" HBox.hgrow="ALWAYS">
                         <HBox spacing="3.0"><Label text="Creation Date" styleClass="field-label"/><Label text="*" styleClass="required-star"/></HBox>
-                        <TextField fx:id="creationDateField" text="Automatically generated" editable="false"/>
+                        <DatePicker fx:id="creationDatePicker" maxWidth="Infinity"/>
                     </VBox>
                 </HBox>
 
