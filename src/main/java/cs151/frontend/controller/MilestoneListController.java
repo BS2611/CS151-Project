@@ -147,10 +147,15 @@ public class MilestoneListController {
 
         alert.showAndWait().ifPresent(response -> {
             if (response == ButtonType.OK) {
-                goalPlanner.deleteMilestone(selectedMilestone.getId());
-                refreshMilestones();
-                Motion.toast("Milestone deleted", false);
-            }
+    goalPlanner.deleteMilestone(selectedMilestone.getId());
+    Motion.toast("Milestone deleted", false);
+
+    try {
+        Main.showGoalListPage();
+    } catch (IOException e) {
+        throw new RuntimeException(e);
+    }
+}
         });
     }
 
