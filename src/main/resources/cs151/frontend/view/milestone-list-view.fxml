@@ -61,7 +61,27 @@
                         <FontIcon iconLiteral="fas-list"/>
                     </graphic>
                 </Button>
+                <Button minWidth="-Infinity"
+                        text="Edit"
+                        onAction="#editMilestone"
+                        styleClass="secondary-button"
+                        contentDisplay="LEFT"
+                        graphicTextGap="8.0">
+                    <graphic>
+                        <FontIcon iconLiteral="fas-edit"/>
+                    </graphic>
+                </Button>
 
+                <Button minWidth="-Infinity"
+                        text="Delete"
+                        onAction="#deleteMilestone"
+                        styleClass="secondary-button"
+                        contentDisplay="LEFT"
+                        graphicTextGap="8.0">
+                    <graphic>
+                        <FontIcon iconLiteral="fas-trash"/>
+                    </graphic>
+                </Button>
             </HBox>
 
 
