@@ -30,7 +30,10 @@ class GoalEditDeleteSeedTest extends BackendTestBase {
 
         Goal stored = planner.getGoal(g.getId());
         assertEquals("Renamed", stored.getName());
+        assertEquals("new description", stored.getDescription());
         assertEquals("Career", stored.getCategory());
+        assertEquals(today.plusDays(40), stored.getTargetDate());
+        assertEquals("In Progress", stored.getStatus());
         assertEquals(25, stored.getProgress());
         assertEquals(newCreation, stored.getCreationDate());
     }
