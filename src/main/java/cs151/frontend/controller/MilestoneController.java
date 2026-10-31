@@ -24,6 +24,7 @@ import java.io.IOException;
 public class MilestoneController {
 
     private final GoalPlanner goalPlanner = new GoalPlanner();
+    private Milestone editingMilestone;
 
     @FXML
     private ComboBox<Goal> goalComboBox;
@@ -36,6 +37,9 @@ public class MilestoneController {
 
     @FXML
     private ComboBox<String> statusComboBox;
+
+    @FXML
+    private Label pageTitleLabel;
 
     @FXML
     private Label feedbackLabel;
@@ -87,8 +91,17 @@ public class MilestoneController {
     }
 
     /** Called by Main right after the page is loaded: pre-selects the goal the user picked in the goal list. */
+
     public void setGoal(Goal goal) {
         goalComboBox.setValue(goal);
+    }
+    public void setMilestone(Milestone milestone) {
+        this.editingMilestone = milestone;
+
+        pageTitleLabel.setText("Edit milestone");
+        milestoneNameField.setText(milestone.getMilestoneName());
+        targetDatePicker.setValue(milestone.getTargetDate());
+        statusComboBox.setValue(milestone.getStatus());
     }
 
     private void showGoalSummary(Goal goal) {
@@ -104,7 +117,7 @@ public class MilestoneController {
     }
 
     @FXML
-    private void saveMilestone() {
+    private void saveMilestone() throws IOException {
         Goal goal = goalComboBox.getValue();
 
         if (goal == null) {
@@ -113,16 +126,30 @@ public class MilestoneController {
         }
 
         try {
-            goalPlanner.createMilestone(
-                    goal.getId(),
-                    milestoneNameField.getText(),
-                    targetDatePicker.getValue(),
-                    statusComboBox.getValue()
-            );
+            if (editingMilestone == null) {
+                // Create a new milestone
+                goalPlanner.createMilestone(
+                        goal.getId(),
+                        milestoneNameField.getText(),
+                        targetDatePicker.getValue(),
+                        statusComboBox.getValue()
+                );
 
-            showSuccess("Milestone saved successfully.");
-            clearForm();
+                showSuccess("Milestone saved successfully.");
+                clearForm();
 
+            } else {
+                // Update the existing milestone
+                goalPlanner.updateMilestone(
+                        editingMilestone.getId(),
+                        milestoneNameField.getText(),
+                        targetDatePicker.getValue(),
+                        statusComboBox.getValue()
+                );
+
+                showSuccess("Milestone updated successfully.");
+                Main.showMilestoneListPage(goal);
+            }
         } catch (ValidationException | PersistenceException exception) {
             showError(exception.getMessage());
         }
