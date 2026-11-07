@@ -31,7 +31,7 @@
             </Button>
 
             <VBox spacing="6.0">
-                <Label text="Create a new milestone" styleClass="page-title"/>
+                <Label fx:id="pageTitleLabel" text="Create a new milestone" styleClass="page-title"/>
                 <Label text="Break your goal into measurable, time-bound checkpoints. Fields marked with * are required." styleClass="page-subtitle" wrapText="true"/>
             </VBox>
 

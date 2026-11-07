@@ -2,6 +2,11 @@
 
 # Who did What
 
+# Version 0.8
+1. Keerat Kaur: Implemented Milestone Edit and Delete functionality, including the prefilled edit form, permanent updates, deletion warning, cascade deletion of linked Tasks and Progress entries, and navigation back to the Goals list.
+2. Bhavpreet Singh: Implemented Goal Edit and Delete functionality, including editable Creation Date, permanent updates, deletion warning and impact counts, cascade deletion of linked Milestones, Tasks, and Progress entries, and two meaningful Progress entries for each seeded Task.
+3. Sujata Giri: Reviewed the project’s MVC organization, expanded the Goal edit persistence tests, added Milestone edit and cascade-delete tests, ran the complete test suite, updated the README, cleaned the project folder, and prepared the final ZIP.
+
 # Version 0.7
 1. Bhavpreet Singh: Implemented the Progress page UI with Entry Date and Note fields, connected the Save button to the backend with validation toasts, added double-click navigation from the Task List page, added a Back button and populated each of the 9 milestones with 2 meaningful tasks
 2. Sujata Giri: Added the View Progress button and Progress List page using a JavaFX TableView sorted by Entry Date ascending, added a Back button and sorted Tasks by Due Date ascending
@@ -56,5 +61,12 @@ How to use: On the Home page click "List Goals" (goals are sorted by Target Date
 - Window: on Windows (and Linux) the title bar is our own. On Windows the native frame hook gives Aero Snap (drag to an edge, Win+Arrow) and the Windows 11 snap layouts over the maximize button; if the hook cannot start, the app falls back to a Java-only move/resize. On macOS the normal system title bar is used (red/yellow/green buttons, window tiling via the green button or by dragging to a screen edge, full screen and resizing all work natively).
 - Goals page: search, status, sort and category filters work on the stored goals; the "..." Actions menu offers View details, Edit goal, Milestones and Delete goal (with a confirmation). Deleting a goal also deletes its milestones.
 - `-Dcs151.fakeMac=true` makes another system hide our custom window buttons like on macOS (the real macOS title bar itself can only be seen on a Mac).
+
+## MVC Design
+- Model layer: Classes in 'cs151.backend.model' are the application’s POJOs. Classes in 'cs151.backend.service' enforce business rules, while classes in 'cs151.backend.persistence' store and retrieve data from SQLite. The 'cs151.backend.dto' package contains objects used to transfer summarized data.
+- View layer: FXML and CSS files under 'src/main/resources/cs151/frontend' define the application pages and visual appearance.
+- Controller layer: Classes in 'cs151.frontend.controller' handle user actions, collect form data, call the service layer, display feedback, and navigate between views.
+- 'Main' starts the JavaFX application and loads the appropriate views. Controllers communicate with 'GoalPlanner' rather than accessing SQLite directly, and the backend does not depend on JavaFX or frontend classes.
+
 
 Thank You!

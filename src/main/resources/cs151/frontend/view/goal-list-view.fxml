@@ -83,7 +83,7 @@
                         <TableColumn fx:id="statusColumn" minWidth="128.0" text="Status" prefWidth="140.0"/>
                         <TableColumn fx:id="progressColumn" minWidth="100.0" text="Progress" prefWidth="120.0"/>
                         <TableColumn fx:id="milestonesColumn" minWidth="120.0" text="Milestones" prefWidth="130.0"/>
-                        <TableColumn fx:id="actionsColumn" minWidth="70.0" text="Actions" prefWidth="80.0" sortable="false"/>
+                        <TableColumn fx:id="actionsColumn" minWidth="120.0" text="Actions" prefWidth="130.0" sortable="false"/>
                     </columns>
                 </TableView>
 

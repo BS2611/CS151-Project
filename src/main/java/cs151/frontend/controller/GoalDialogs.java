@@ -1,6 +1,7 @@
 package cs151.frontend.controller;
 
 import cs151.application.Main;
+import cs151.backend.dto.GoalDeletionImpact;
 import cs151.backend.model.Goal;
 import cs151.backend.model.Milestone;
 import javafx.geometry.Pos;
@@ -129,7 +130,7 @@ final class GoalDialogs {
     }
 
     /** "Delete this goal?" confirmation; {@code onConfirm} runs only if the user presses Delete. */
-    static void confirmDelete(Goal goal, int milestoneCount, Runnable onConfirm) {
+    static void confirmDelete(Goal goal, GoalDeletionImpact impact, Runnable onConfirm) {
         FontIcon trash = new FontIcon("fas-trash");
         trash.getStyleClass().add("danger-icon");
         Label badge = new Label();
@@ -139,8 +140,11 @@ final class GoalDialogs {
         Label title = new Label("Delete this goal?");
         title.getStyleClass().add("dialog-title");
 
-        String extra = milestoneCount == 0 ? "" : " and its " + milestoneCount + (milestoneCount == 1 ? " milestone" : " milestones");
-        Label text = new Label("\"" + goal.getName() + "\"" + extra + " will be permanently deleted. This cannot be undone.");
+        Label text = new Label("\"" + goal.getName() + "\" and all of its linked data will be permanently deleted: "
+                + count(impact.milestones(), "milestone") + ", "
+                + count(impact.tasks(), "task") + " and "
+                + count(impact.progresses(), "progress entry", "progress entries")
+                + ". This cannot be undone.");
         text.getStyleClass().add("page-subtitle");
         text.setWrapText(true);
 
@@ -164,6 +168,15 @@ final class GoalDialogs {
         card.setMaxWidth(480);
         card.setMaxHeight(Region.USE_PREF_SIZE);
         Main.showOverlay(card);
+    }
+
+    /** "1 milestone" / "3 milestones". */
+    private static String count(int number, String singular) {
+        return count(number, singular, singular + "s");
+    }
+
+    private static String count(int number, String singular, String plural) {
+        return number + " " + (number == 1 ? singular : plural);
     }
 
     private static VBox infoBlock(String caption, String value, String sub) {

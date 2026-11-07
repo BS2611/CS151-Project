@@ -13,10 +13,10 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.ProgressBar;
@@ -212,9 +212,37 @@ public class GoalListController {
             }
         });
         actionsColumn.setCellFactory(column -> new TableCell<>() {
+            private final Button editButton = new Button();
+            private final Button deleteButton = new Button();
             private final Button menuButton = new Button();
+            private final HBox buttons = new HBox(2, editButton, deleteButton, menuButton);
 
             {
+                // v0.8: visible Edit and Delete buttons for every goal; "..." keeps the other actions.
+                editButton.setGraphic(new FontIcon("fas-pen"));
+                editButton.getStyleClass().add("icon-button");
+                editButton.setTooltip(new Tooltip("Edit goal"));
+                editButton.setFocusTraversable(false);
+                editButton.setOnAction(event -> {
+                    Goal goal = getTableRow() == null ? null : getTableRow().getItem();
+                    if (goal != null) {
+                        openEditPage(goal);
+                    }
+                });
+
+                deleteButton.setGraphic(new FontIcon("fas-trash"));
+                deleteButton.getStyleClass().addAll("icon-button", "icon-button-danger");
+                deleteButton.setTooltip(new Tooltip("Delete goal"));
+                deleteButton.setFocusTraversable(false);
+                deleteButton.setOnAction(event -> {
+                    Goal goal = getTableRow() == null ? null : getTableRow().getItem();
+                    if (goal != null) {
+                        GoalDialogs.confirmDelete(goal, goalPlanner.getDeletionImpact(goal.getId()),
+                                () -> deleteGoal(goal));
+                    }
+                });
+
+                buttons.setAlignment(Pos.CENTER);
                 menuButton.setGraphic(new FontIcon("fas-ellipsis-h"));
                 menuButton.getStyleClass().add("icon-button");
                 menuButton.setFocusTraversable(false);
@@ -231,7 +259,7 @@ public class GoalListController {
             protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
                 setText(null);
-                setGraphic(empty ? null : menuButton);
+                setGraphic(empty ? null : buttons);
                 setAlignment(Pos.CENTER);
             }
         });
@@ -489,7 +517,7 @@ public class GoalListController {
         }
     }
 
-    /** The "..." menu of a row: view details, edit, milestones and delete. */
+    /** The "..." menu of a row: view details and milestones (edit and delete have their own buttons). */
     private void showActionsMenu(Button anchor, Goal goal) {
         ContextMenu menu = new ContextMenu();
         menu.getStyleClass().add("actions-menu");
@@ -498,17 +526,10 @@ public class GoalListController {
         view.setOnAction(event -> GoalDialogs.showDetails(goal, goalPlanner.getMilestonesForGoal(goal.getId()),
                 () -> openEditPage(goal), () -> openMilestoneList(goal)));
 
-        MenuItem edit = menuItem("Edit goal", "fas-pen", false);
-        edit.setOnAction(event -> openEditPage(goal));
-
         MenuItem milestones = menuItem("Milestones", "fas-list-ul", false);
         milestones.setOnAction(event -> openMilestoneList(goal));
 
-        MenuItem delete = menuItem("Delete goal", "fas-trash", true);
-        delete.setOnAction(event -> GoalDialogs.confirmDelete(goal,
-                goalPlanner.getMilestonesForGoal(goal.getId()).size(), () -> deleteGoal(goal)));
-
-        menu.getItems().addAll(view, edit, milestones, new SeparatorMenuItem(), delete);
+        menu.getItems().addAll(view, milestones);
         menu.show(anchor, javafx.geometry.Side.BOTTOM, 0, 4);
     }
 

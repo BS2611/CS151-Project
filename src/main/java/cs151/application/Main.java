@@ -206,14 +206,28 @@ public class Main extends Application {
     }
 
     /** Shows the Milestone page (create form) with the given goal pre-selected. */
+
     public static void showMilestonePage(Goal goal) throws IOException {
         homeActive = false;
-        breadcrumb = "Goals  \u203A  New Milestone";
+        breadcrumb = "Goals  ›  New Milestone";
         FXMLLoader loader = createLoader("milestone-view.fxml");
         setPage(loader.load());
 
         MilestoneController controller = loader.getController();
         controller.setGoal(goal);
+    }
+
+    /** Shows the Milestone page in edit mode for an existing milestone. */
+    public static void showMilestoneEditPage(Goal goal, Milestone milestone) throws IOException {
+        homeActive = false;
+        breadcrumb = "Goals  ›  Milestones  ›  Edit Milestone";
+
+        FXMLLoader loader = createLoader("milestone-view.fxml");
+        setPage(loader.load());
+
+        MilestoneController controller = loader.getController();
+        controller.setGoal(goal);
+        controller.setMilestone(milestone);
     }
 
     /** Shows the Milestone List page with all milestones of the given goal. */

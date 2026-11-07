@@ -8,6 +8,8 @@ import cs151.frontend.Motion;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -111,6 +113,50 @@ public class MilestoneListController {
     @FXML
     private void createMilestone() throws IOException {
         Main.showMilestonePage(goal);
+    }
+
+    @FXML
+    private void editMilestone() throws IOException {
+        Milestone selectedMilestone =
+                milestonesTable.getSelectionModel().getSelectedItem();
+
+        if (selectedMilestone == null) {
+            Motion.toast("Please select a milestone first.", false);
+            return;
+        }
+
+        Main.showMilestoneEditPage(goal, selectedMilestone);
+    }
+
+    @FXML
+    private void deleteMilestone() {
+        Milestone selectedMilestone =
+                milestonesTable.getSelectionModel().getSelectedItem();
+
+        if (selectedMilestone == null) {
+            Motion.toast("Please select a milestone first.", false);
+            return;
+        }
+
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Delete Milestone");
+        alert.setHeaderText("Delete " + selectedMilestone.getMilestoneName() + "?");
+        alert.setContentText(
+                "All Tasks and Progresses linked to this milestone will also be permanently deleted."
+        );
+
+        alert.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+    goalPlanner.deleteMilestone(selectedMilestone.getId());
+    Motion.toast("Milestone deleted", false);
+
+    try {
+        Main.showGoalListPage();
+    } catch (IOException e) {
+        throw new RuntimeException(e);
+    }
+}
+        });
     }
 
     @FXML
