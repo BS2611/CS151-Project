@@ -1,21 +1,21 @@
 package cs151.application;
 
-import cs151.backend.model.Goal;
-import cs151.backend.service.GoalPlanner;
-import cs151.backend.service.SeedData;
-import cs151.backend.model.Milestone;
-import cs151.backend.model.Task;
-import cs151.frontend.controller.ProgressController;
-import cs151.frontend.controller.ProgressListController;
-import cs151.frontend.controller.MilestoneController;
-import cs151.frontend.controller.MilestoneListController;
-import cs151.frontend.controller.TaskController;
-import cs151.frontend.controller.TaskListController;
+import cs151.model.Goal;
+import cs151.model.GoalPlanner;
+import cs151.model.SeedData;
+import cs151.model.Milestone;
+import cs151.model.Task;
+import cs151.controller.ProgressController;
+import cs151.controller.ProgressListController;
+import cs151.controller.MilestoneController;
+import cs151.controller.MilestoneListController;
+import cs151.controller.TaskController;
+import cs151.controller.TaskListController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
-import cs151.frontend.Motion;
-import cs151.frontend.WinFrame;
-import cs151.frontend.WindowChrome;
+import cs151.view.Motion;
+import cs151.view.WinFrame;
+import cs151.view.WindowChrome;
 import javafx.scene.Parent;
 import javafx.geometry.Pos;
 import javafx.scene.layout.StackPane;
@@ -65,7 +65,7 @@ public class Main extends Application {
 
         scene = new Scene(createShell(), 1280, 800);
         scene.getStylesheets().add(
-                Main.class.getResource("/cs151/frontend/css/application.css").toExternalForm()
+                Main.class.getResource("/cs151/view/css/application.css").toExternalForm()
         );
         scene.setFill(Color.web("#FFFFFF"));
         Motion.install(scene);
@@ -151,7 +151,7 @@ public class Main extends Application {
     /** Loads the bundled Inter font (the typeface used in the Figma design) so it does not need to be installed. */
     public static void loadFonts() {
         for (String file : new String[]{"Inter-Regular.ttf", "Inter-Bold.ttf"}) {
-            Font.loadFont(Main.class.getResourceAsStream("/cs151/frontend/fonts/" + file), 12);
+            Font.loadFont(Main.class.getResourceAsStream("/cs151/view/fonts/" + file), 12);
         }
     }
 
@@ -189,7 +189,7 @@ public class Main extends Application {
         FXMLLoader loader = createLoader("goal-view.fxml");
         setPage(loader.load());
 
-        cs151.frontend.controller.GoalController controller = loader.getController();
+        cs151.controller.GoalController controller = loader.getController();
         controller.setGoal(goal);
     }
 
@@ -317,7 +317,7 @@ public class Main extends Application {
 
     private static FXMLLoader createLoader(String fileName) {
         return new FXMLLoader(
-                Main.class.getResource("/cs151/frontend/view/" + fileName)
+                Main.class.getResource("/cs151/view/" + fileName)
         );
     }
 

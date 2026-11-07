@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.String?>
+<?import javafx.collections.FXCollections?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<HBox styleClass="app-shell"
+      xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="cs151.controller.GoalController">
+
+    <fx:include source="sidebar-view.fxml"/>
+
+    <VBox HBox.hgrow="ALWAYS" minWidth="0.0">
+        <fx:include source="topbar-view.fxml"/>
+        <ScrollPane styleClass="content-scroll" fitToWidth="true" hbarPolicy="NEVER" VBox.vgrow="ALWAYS">
+        <HBox alignment="TOP_CENTER" minWidth="0.0">
+        <VBox styleClass="page" HBox.hgrow="ALWAYS" maxWidth="1400.0" minWidth="0.0">
+
+            <Button fx:id="backLink" text="Back to Home" onAction="#goBack" styleClass="back-link" contentDisplay="LEFT" graphicTextGap="8.0">
+                <graphic><FontIcon iconLiteral="fas-arrow-left"/></graphic>
+            </Button>
+
+            <VBox spacing="6.0">
+                <Label fx:id="pageTitle" text="Create a new goal" styleClass="page-title"/>
+                <Label text="Define your long-term goal, timeline and starting status. Fields marked with * are required." styleClass="page-subtitle" wrapText="true"/>
+            </VBox>
+
+            <VBox styleClass="card" style="-fx-padding: 24 24 0 24;">
+
+                <Label text="Goal Overview" styleClass="section-title"/>
+                <Pane styleClass="divider"/>
+
+                <VBox spacing="6.0">
+                    <HBox spacing="3.0"><Label text="Goal Name" styleClass="field-label"/><Label text="*" styleClass="required-star"/></HBox>
+                    <TextField fx:id="goalNameField" promptText="Enter a unique goal name"/>
+                </VBox>
+
+                <VBox spacing="6.0">
+                    <HBox spacing="3.0"><Label text="Category" styleClass="field-label"/><Label text="*" styleClass="required-star"/></HBox>
+                    <ComboBox fx:id="categoryComboBox" promptText="Select a category" maxWidth="Infinity">
+                        <items>
+                            <FXCollections fx:factory="observableArrayList">
+                                <String fx:value="Academic"/>
+                                <String fx:value="Career"/>
+                                <String fx:value="Health"/>
+                                <String fx:value="Financial"/>
+                                <String fx:value="Personal"/>
+                                <String fx:value="Other"/>
+                            </FXCollections>
+                        </items>
+                    </ComboBox>
+                </VBox>
+
+                <VBox spacing="6.0">
+                    <Label text="Description" styleClass="field-label"/>
+                    <TextArea fx:id="descriptionArea" promptText="Enter the desired outcome" prefRowCount="3" wrapText="true"/>
+                </VBox>
+
+                <Label text="Timeline &amp; Progress" styleClass="section-title" style="-fx-padding: 12 0 0 0;"/>
+                <Pane styleClass="divider"/>
+
+                <HBox spacing="20.0">
+                    <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                        <HBox spacing="3.0"><Label text="Target Date" styleClass="field-label"/><Label text="*" styleClass="required-star"/></HBox>
+                        <DatePicker fx:id="targetDatePicker" promptText="Today or a future date" maxWidth="Infinity"/>
+                    </VBox>
+                    <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                        <HBox spacing="3.0"><Label text="Creation Date" styleClass="field-label"/><Label text="*" styleClass="required-star"/></HBox>
+                        <DatePicker fx:id="creationDatePicker" maxWidth="Infinity"/>
+                    </VBox>
+                </HBox>
+
+                <HBox spacing="20.0">
+                    <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                        <HBox spacing="3.0"><Label text="Status" styleClass="field-label"/><Label text="*" styleClass="required-star"/></HBox>
+                        <ComboBox fx:id="statusComboBox" value="Not Started" maxWidth="Infinity">
+                            <items>
+                                <FXCollections fx:factory="observableArrayList">
+                                    <String fx:value="Not Started"/>
+                                    <String fx:value="In Progress"/>
+                                    <String fx:value="On Hold"/>
+                                    <String fx:value="Completed"/>
+                                    <String fx:value="Abandoned"/>
+                                </FXCollections>
+                            </items>
+                        </ComboBox>
+                    </VBox>
+                    <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                        <HBox spacing="3.0"><Label text="Progress (%)" styleClass="field-label"/><Label text="*" styleClass="required-star"/></HBox>
+                        <TextField fx:id="progressField" text="0" promptText="Enter a whole number from 0 to 100"/>
+                    </VBox>
+                </HBox>
+
+                <Label fx:id="feedbackLabel" text="" wrapText="true" textFill="#C62828" style="-fx-padding: 4 0 8 0;"/>
+
+                <HBox styleClass="card-footer" alignment="CENTER_RIGHT" spacing="12.0">
+                    <VBox.margin><Insets left="-24" right="-24"/></VBox.margin>
+                    <Button minWidth="-Infinity" fx:id="backButton" text="Cancel" onAction="#goBack" styleClass="secondary-button"/>
+                    <Button minWidth="-Infinity" fx:id="createGoalButton" text="Create Goal" onAction="#createGoal" styleClass="primary-button"/>
+                </HBox>
+            </VBox>
+
+        </VBox>
+        </HBox>
+        </ScrollPane>
+    </VBox>
+</HBox>
