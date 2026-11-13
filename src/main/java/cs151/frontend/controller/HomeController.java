@@ -32,4 +32,8 @@ public class HomeController {
     private void openGoalListPage() throws IOException {
         Main.showGoalListPage();
     }
-}
+    @FXML
+        private void openSearchPage() throws IOException {
+            Main.showSearchPage();
+        }
+    }
