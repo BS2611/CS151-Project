@@ -4,13 +4,12 @@ import cs151.application.Main;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
-import java.io.IOException;
-
-/** Controller of the Home page (home-view.fxml): navigates to the Goal page and the Goal List page. */
+/** Controller of the Home page: navigates to Goal, Goal List, and Search pages. */
 public class HomeController {
 
     @FXML
@@ -18,7 +17,10 @@ public class HomeController {
 
     @FXML
     private void initialize() {
-        dateChip.setText("Today, " + LocalDate.now().format(DateTimeFormatter.ofPattern("EEE, MMM d, yyyy", Locale.ENGLISH)));
+        dateChip.setText("Today, " +
+                LocalDate.now().format(
+                        DateTimeFormatter.ofPattern("EEE, MMM d, yyyy", Locale.ENGLISH)
+                ));
     }
 
     /** Create Goal button: opens the Goal page. */
@@ -32,8 +34,10 @@ public class HomeController {
     private void openGoalListPage() throws IOException {
         Main.showGoalListPage();
     }
+
+    /** Search button: opens the Global Search page. */
     @FXML
-        private void openSearchPage() throws IOException {
-            Main.showSearchPage();
-        }
+    private void openSearchPage() throws IOException {
+        Main.showSearchPage();
     }
+}
