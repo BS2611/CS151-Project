@@ -41,13 +41,19 @@ public class Main extends Application {
     private static StackPane pageHost;
     private static StackPane overlayLayer;
 
-    /** True while the Home page is showing, so the sidebar highlights the right item. */
+    /**
+     * True while the Home page is showing, so the sidebar highlights the right item.
+     */
     private static boolean homeActive = true;
 
-    /** Text of the breadcrumb in the top bar, set by every showXxx method. */
+    /**
+     * Text of the breadcrumb in the top bar, set by every showXxx method.
+     */
     private static String breadcrumb = "Home";
 
-    /** Search text typed in the top bar, picked up once by the Goal List page. */
+    /**
+     * Search text typed in the top bar, picked up once by the Goal List page.
+     */
     private static String pendingSearch;
 
     @Override
@@ -120,13 +126,17 @@ public class Main extends Application {
         return shell;
     }
 
-    /** Puts a freshly loaded page in the window and plays the page transition. */
+    /**
+     * Puts a freshly loaded page in the window and plays the page transition.
+     */
     private static void setPage(Parent page) {
         pageHost.getChildren().setAll(page);
         Motion.pageIn(page);
     }
 
-    /** Shows a pop-up card centred over the page. */
+    /**
+     * Shows a pop-up card centred over the page.
+     */
     public static void showOverlay(javafx.scene.Node card) {
         overlayLayer.getChildren().setAll(card);
         overlayLayer.setManaged(true);
@@ -148,7 +158,9 @@ public class Main extends Application {
         return chrome;
     }
 
-    /** Loads the bundled Inter font (the typeface used in the Figma design) so it does not need to be installed. */
+    /**
+     * Loads the bundled Inter font (the typeface used in the Figma design) so it does not need to be installed.
+     */
     public static void loadFonts() {
         for (String file : new String[]{"Inter-Regular.ttf", "Inter-Bold.ttf"}) {
             Font.loadFont(Main.class.getResourceAsStream("/cs151/frontend/fonts/" + file), 12);
@@ -163,7 +175,9 @@ public class Main extends Application {
         return breadcrumb;
     }
 
-    /** Returns the search text waiting for the Goal List page (and forgets it). */
+    /**
+     * Returns the search text waiting for the Goal List page (and forgets it).
+     */
     public static String takePendingSearch() {
         String text = pendingSearch;
         pendingSearch = null;
@@ -182,7 +196,9 @@ public class Main extends Application {
         setPage(loadView("goal-view.fxml"));
     }
 
-    /** Shows the Goal page in edit mode for an existing goal. */
+    /**
+     * Shows the Goal page in edit mode for an existing goal.
+     */
     public static void showEditGoalPage(Goal goal) throws IOException {
         homeActive = false;
         breadcrumb = "Goals  \u203A  Edit Goal";
@@ -197,7 +213,9 @@ public class Main extends Application {
         showGoalListPage(null);
     }
 
-    /** Shows the Goal List with the given text pre-filled in its search box (null or blank for none). */
+    /**
+     * Shows the Goal List with the given text pre-filled in its search box (null or blank for none).
+     */
     public static void showGoalListPage(String search) throws IOException {
         homeActive = false;
         breadcrumb = "Goals";
@@ -205,7 +223,14 @@ public class Main extends Application {
         setPage(loadView("goal-list-view.fxml"));
     }
 
-    /** Shows the Milestone page (create form) with the given goal pre-selected. */
+    /**
+     * Shows the Milestone page (create form) with the given goal pre-selected.
+     */
+    public static void showSearchPage() throws IOException {
+        homeActive = false;
+        breadcrumb = "Search";
+        setPage(loadView("search-view.fxml"));
+    }
 
     public static void showMilestonePage(Goal goal) throws IOException {
         homeActive = false;
@@ -217,7 +242,9 @@ public class Main extends Application {
         controller.setGoal(goal);
     }
 
-    /** Shows the Milestone page in edit mode for an existing milestone. */
+    /**
+     * Shows the Milestone page in edit mode for an existing milestone.
+     */
     public static void showMilestoneEditPage(Goal goal, Milestone milestone) throws IOException {
         homeActive = false;
         breadcrumb = "Goals  ›  Milestones  ›  Edit Milestone";
@@ -230,7 +257,9 @@ public class Main extends Application {
         controller.setMilestone(milestone);
     }
 
-    /** Shows the Milestone List page with all milestones of the given goal. */
+    /**
+     * Shows the Milestone List page with all milestones of the given goal.
+     */
     public static void showMilestoneListPage(Goal goal) throws IOException {
         homeActive = false;
         breadcrumb = "Goals  \u203A  Milestones";
@@ -240,7 +269,10 @@ public class Main extends Application {
         MilestoneListController controller = loader.getController();
         controller.setGoal(goal);
     }
-    /** Opens the Task page for the selected milestone. */
+
+    /**
+     * Opens the Task page for the selected milestone.
+     */
     public static void showTaskPage(Milestone milestone)
             throws IOException {
 
@@ -258,7 +290,9 @@ public class Main extends Application {
         controller.setMilestone(milestone);
     }
 
-    /** Opens the Task List page for the selected milestone. */
+    /**
+     * Opens the Task List page for the selected milestone.
+     */
     public static void showTaskListPage(Milestone milestone)
             throws IOException {
 
@@ -276,7 +310,9 @@ public class Main extends Application {
         controller.setMilestone(milestone);
     }
 
-    /** Shows the Progress page (add a progress note) for the given task. */
+    /**
+     * Shows the Progress page (add a progress note) for the given task.
+     */
     public static void showProgressPage(Task task)
             throws IOException {
 
