@@ -210,37 +210,34 @@ public class Main extends Application {
     }
 
     public static void showGoalListPage() throws IOException {
-        showGoalListPage(null);
-    }
+    showGoalListPage(null);
+}
 
-    /**
-     * Shows the Goal List with the given text pre-filled in its search box (null or blank for none).
-     */
-    public static void showGoalListPage(String search) throws IOException {
-        homeActive = false;
-        breadcrumb = "Goals";
-        pendingSearch = search == null || search.isBlank() ? null : search.trim();
-        setPage(loadView("goal-list-view.fxml"));
-    }
+/** Shows the Goal List with the given text pre-filled in its search box (null or blank for none). */
+public static void showGoalListPage(String search) throws IOException {
+    homeActive = false;
+    breadcrumb = "Goals";
+    pendingSearch = search == null || search.isBlank() ? null : search.trim();
+    setPage(loadView("goal-list-view.fxml"));
+}
 
-    /**
-     * Shows the Milestone page (create form) with the given goal pre-selected.
-     */
-    public static void showSearchPage() throws IOException {
-        homeActive = false;
-        breadcrumb = "Search";
-        setPage(loadView("search-view.fxml"));
-    }
+/** Shows the Global Search page. */
+public static void showSearchPage() throws IOException {
+    homeActive = false;
+    breadcrumb = "Search";
+    setPage(loadView("search-view.fxml"));
+}
 
-    public static void showMilestonePage(Goal goal) throws IOException {
-        homeActive = false;
-        breadcrumb = "Goals  ›  New Milestone";
-        FXMLLoader loader = createLoader("milestone-view.fxml");
-        setPage(loader.load());
+/** Shows the Milestone page (create form) with the given goal pre-selected. */
+public static void showMilestonePage(Goal goal) throws IOException {
+    homeActive = false;
+    breadcrumb = "Goals  ›  New Milestone";
+    FXMLLoader loader = createLoader("milestone-view.fxml");
+    setPage(loader.load());
 
-        MilestoneController controller = loader.getController();
-        controller.setGoal(goal);
-    }
+    MilestoneController controller = loader.getController();
+    controller.setGoal(goal);
+}
 
     /**
      * Shows the Milestone page in edit mode for an existing milestone.
