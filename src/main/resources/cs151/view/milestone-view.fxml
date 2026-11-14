@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<HBox styleClass="app-shell"
+      xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="cs151.controller.MilestoneController">
+
+    <fx:include source="sidebar-view.fxml"/>
+
+    <VBox HBox.hgrow="ALWAYS" minWidth="0.0">
+        <fx:include source="topbar-view.fxml"/>
+        <ScrollPane styleClass="content-scroll" fitToWidth="true" hbarPolicy="NEVER" VBox.vgrow="ALWAYS">
+        <HBox alignment="TOP_CENTER" minWidth="0.0">
+        <VBox styleClass="page" HBox.hgrow="ALWAYS" maxWidth="1400.0" minWidth="0.0">
+
+            <Button text="Back to Goals" onAction="#goBack" styleClass="back-link" contentDisplay="LEFT" graphicTextGap="8.0">
+                <graphic><FontIcon iconLiteral="fas-arrow-left"/></graphic>
+            </Button>
+
+            <VBox spacing="6.0">
+                <Label fx:id="pageTitleLabel" text="Create a new milestone" styleClass="page-title"/>
+                <Label text="Break your goal into measurable, time-bound checkpoints. Fields marked with * are required." styleClass="page-subtitle" wrapText="true"/>
+            </VBox>
+
+            <HBox styleClass="card, card-accent" alignment="CENTER_LEFT" spacing="24.0">
+                <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                    <HBox spacing="10.0" alignment="CENTER_LEFT">
+                        <Label fx:id="summaryCategory" text="GOAL" styleClass="pill, pill-neutral"/>
+                        <Label text="PARENT GOAL" styleClass="eyebrow"/>
+                    </HBox>
+                    <Label fx:id="summaryName" text="No goal selected" styleClass="section-title" style="-fx-font-size: 20px;" wrapText="true"/>
+                    <Label fx:id="summaryDeadline" text="" styleClass="helper-text"/>
+                </VBox>
+                <VBox spacing="6.0" minWidth="240.0" prefWidth="240.0" alignment="CENTER_LEFT">
+                    <HBox alignment="CENTER_LEFT">
+                        <Label text="GOAL PROGRESS" styleClass="eyebrow" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                        <Label fx:id="summaryPercent" text="" styleClass="progress-percent"/>
+                    </HBox>
+                    <ProgressBar fx:id="summaryProgress" progress="0.0" maxWidth="Infinity"/>
+                    <Label fx:id="summaryHint" text="" styleClass="helper-text" wrapText="true"/>
+                </VBox>
+            </HBox>
+
+            <VBox styleClass="card" style="-fx-padding: 24 24 0 24;">
+
+                <Label text="Goal Association" styleClass="section-title"/>
+                <Pane styleClass="divider"/>
+
+                <VBox spacing="6.0">
+                    <HBox spacing="3.0"><Label text="Goal" styleClass="field-label"/><Label text="*" styleClass="required-star"/></HBox>
+                    <ComboBox fx:id="goalComboBox" promptText="Select a goal" maxWidth="Infinity"/>
+                    <Label text="Select which goal this milestone moves forward." styleClass="helper-text"/>
+                </VBox>
+
+                <Label text="Milestone Specifics" styleClass="section-title" style="-fx-padding: 12 0 0 0;"/>
+                <Pane styleClass="divider"/>
+
+                <VBox spacing="6.0">
+                    <HBox spacing="3.0"><Label text="Milestone Name" styleClass="field-label"/><Label text="*" styleClass="required-star"/></HBox>
+                    <TextField fx:id="milestoneNameField" promptText="Enter a name that is unique within the goal"/>
+                </VBox>
+
+                <HBox spacing="20.0">
+                    <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                        <HBox spacing="3.0"><Label text="Target Date" styleClass="field-label"/><Label text="*" styleClass="required-star"/></HBox>
+                        <DatePicker fx:id="targetDatePicker" promptText="Not later than the goal's target date" maxWidth="Infinity"/>
+                    </VBox>
+                    <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                        <HBox spacing="3.0"><Label text="Status" styleClass="field-label"/><Label text="*" styleClass="required-star"/></HBox>
+                        <ComboBox fx:id="statusComboBox" maxWidth="Infinity"/>
+                    </VBox>
+                </HBox>
+
+                <Label fx:id="feedbackLabel" text="" wrapText="true" textFill="#C62828" style="-fx-padding: 4 0 8 0;"/>
+
+                <HBox styleClass="card-footer" alignment="CENTER_RIGHT" spacing="12.0">
+                    <VBox.margin><Insets left="-24" right="-24"/></VBox.margin>
+                    <Button minWidth="-Infinity" fx:id="backButton" text="Cancel" onAction="#goBack" styleClass="secondary-button"/>
+                    <Button minWidth="-Infinity" fx:id="saveMilestoneButton" text="Save Milestone" onAction="#saveMilestone" styleClass="primary-button"/>
+                </HBox>
+            </VBox>
+
+        </VBox>
+        </HBox>
+        </ScrollPane>
+    </VBox>
+</HBox>

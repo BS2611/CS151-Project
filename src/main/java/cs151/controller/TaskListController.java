@@ -1,0 +1,121 @@
+package cs151.controller;
+
+import cs151.application.Main;
+import cs151.model.Goal;
+import cs151.model.Milestone;
+import cs151.model.Task;
+import cs151.model.GoalPlanner;
+import cs151.view.Motion;
+import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.collections.FXCollections;
+import javafx.fxml.FXML;
+import javafx.scene.control.Label;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
+import javafx.scene.control.TableView;
+
+import java.io.IOException;
+
+public class TaskListController {
+
+    private final GoalPlanner goalPlanner = new GoalPlanner();
+
+    private Milestone milestone;
+
+    @FXML
+    private Label titleLabel;
+
+    @FXML
+    private Label subtitleLabel;
+
+    @FXML
+    private TableView<Task> tasksTable;
+
+    @FXML
+    private TableColumn<Task, String> descriptionColumn;
+
+    @FXML
+    private TableColumn<Task, String> dueDateColumn;
+
+    @FXML
+    private TableColumn<Task, String> priorityColumn;
+
+    @FXML
+    private TableColumn<Task, String> statusColumn;
+
+    @FXML
+    private void initialize() {
+        descriptionColumn.setCellValueFactory(cell ->
+                new ReadOnlyStringWrapper(
+                        cell.getValue().getDescription()));
+
+        dueDateColumn.setCellValueFactory(cell ->
+                new ReadOnlyStringWrapper(
+                        cell.getValue().getDueDate().toString()));
+
+        priorityColumn.setCellValueFactory(cell ->
+                new ReadOnlyStringWrapper(
+                        cell.getValue().getPriority()));
+
+        statusColumn.setCellValueFactory(cell ->
+                new ReadOnlyStringWrapper(
+                        cell.getValue().getStatus()));
+
+        tasksTable.setPlaceholder(
+                new Label("This milestone has no tasks yet."));
+
+        // Double-clicking a task row opens the Progress page for that task.
+        tasksTable.setRowFactory(table -> {
+            TableRow<Task> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && !row.isEmpty()) {
+                    try {
+                        Main.showProgressPage(row.getItem());
+                    } catch (IOException exception) {
+                        Motion.toast("Could not open the progress page.", true);
+                    }
+                }
+            });
+            return row;
+        });
+    }
+
+    public void setMilestone(Milestone milestone) {
+        this.milestone = milestone;
+
+        titleLabel.setText(milestone.getMilestoneName());
+
+        subtitleLabel.setText(
+                "Tasks sorted by due date, ascending");
+
+        tasksTable.setItems(
+                FXCollections.observableArrayList(
+                        goalPlanner.getTasksForMilestone(
+                                milestone.getId())));
+    }
+    /**
+     * Opens the stored progress entries for the selected task.
+     */
+    @FXML
+    private void viewProgress() {
+        Task selectedTask =
+                tasksTable.getSelectionModel().getSelectedItem();
+
+        if (selectedTask == null) {
+            Motion.toast("Please select a task first.", true);
+            return;
+        }
+
+        try {
+            Main.showProgressListPage(selectedTask);
+        } catch (IOException exception) {
+            Motion.toast("Could not open the progress list.", true);
+        }
+    }
+
+    @FXML
+    private void goBack() throws IOException {
+        Goal goal = goalPlanner.getGoal(milestone.getGoalId());
+        Main.showMilestoneListPage(goal);
+    }
+}
