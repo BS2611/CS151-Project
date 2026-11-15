@@ -56,6 +56,9 @@ public class Main extends Application {
      */
     private static String pendingSearch;
 
+    /** Text typed in the top bar, picked up once by the Global Search page. */
+    private static String pendingGlobalSearch;
+
     @Override
     public void start(Stage primaryStage) throws IOException {
         loadFonts();
@@ -184,6 +187,13 @@ public class Main extends Application {
         return text;
     }
 
+    /** Returns the text waiting for the Global Search page (and forgets it). */
+    public static String takePendingGlobalSearch() {
+        String text = pendingGlobalSearch;
+        pendingGlobalSearch = null;
+        return text;
+    }
+
     public static void showHomePage() throws IOException {
         homeActive = true;
         breadcrumb = "Home";
@@ -223,6 +233,12 @@ public static void showGoalListPage(String search) throws IOException {
 
 /** Shows the Global Search page. */
 public static void showSearchPage() throws IOException {
+    showSearchPage(null);
+}
+
+/** Shows the Global Search page and runs a search for the given text (null or blank for none). */
+public static void showSearchPage(String query) throws IOException {
+    pendingGlobalSearch = query == null || query.isBlank() ? null : query.trim();
     homeActive = false;
     breadcrumb = "Search";
     setPage(loadView("search-view.fxml"));
