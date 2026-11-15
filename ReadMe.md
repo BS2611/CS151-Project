@@ -2,6 +2,11 @@
 
 # Who did What
 
+# Version 0.9
+1. Keerat Kaur: Created the Search page UI (global search bar and results TableView) with the Search button on the Home page, and seeded the 3 Goals with 3 Milestones each.
+2. Sujata Giri: Implemented the global search across Goals, Milestones and Tasks (a Goal appears once even when several of its items match), wrote its first tests, and seeded the Tasks and Progress entries.
+3. Bhavpreet Singh: Connected the search results to the Milestone and Task pages (double-click a result or use View Milestones), made the search also match dates and progress, added the search tests, checked the MVC packages, updated the README, cleaned the project folder and created the final ZIP.
+
 # Version 0.8
 1. Keerat Kaur: Implemented Milestone Edit and Delete functionality, including the prefilled edit form, permanent updates, deletion warning, cascade deletion of linked Tasks and Progress entries, and navigation back to the Goals list.
 2. Bhavpreet Singh: Implemented Goal Edit and Delete functionality, including editable Creation Date, permanent updates, deletion warning and impact counts, cascade deletion of linked Milestones, Tasks, and Progress entries, and two meaningful Progress entries for each seeded Task.
@@ -48,13 +53,15 @@ Run the project with Zulu 23 using Maven.
 
 Please run 'Main.java' (package cs151.application) to run the application.
 
-Data note: Goals and Milestones are saved permanently in the SQLite database file data/my-goal-tracker.db, which is created automatically at runtime. No manual setup is required. The sqlite-jdbc library used by the backend is declared as a dependency in pom.xml.
+Data note: Goals, Milestones, Tasks and Progress entries are saved permanently in the SQLite database file data/my-goal-tracker.db, which is created automatically at runtime. No manual setup is required. The sqlite-jdbc library used by the backend is declared as a dependency in pom.xml.
 
 How to use: On the Home page click "List Goals" (goals are sorted by Target Date, soonest first). Select a goal and click "Create Milestone" to open the Milestone page, then enter the milestone and click "Save". Double-click a goal (or select it and click "View Milestones") to open the Milestone List page, which shows that goal's milestones in a table sorted by Target Date, soonest first. Select a milestone to view its tasks, which are sorted by Due Date, soonest first. Double-click a task to add a Progress entry, or select a task and click "View Progress" to see its Progress history sorted by Entry Date, oldest first. Every page has a "Back" button.
 
+Search: on the Home page click "Search" to open the Global Search page. Type text and press Enter (or click "Search"); every Goal is listed once when the text is found (ignoring upper/lower case) in the Goal itself (name, description, category, status, dates, progress) or in one of its Milestones (name, target date, status) or Tasks (description, due date, priority, status). Double-click a result (or select it and click "View Milestones") to open its Milestones, then select a Milestone and click "View Tasks". The Back button on the Milestone page returns to the Goals list.
+
 ## UI notes (frontend)
 - Run: `mvn clean javafx:run` (Zulu/JDK 23 or newer). The first build needs internet access to download the Ikonli icon libraries (`ikonli-javafx`, `ikonli-fontawesome5-pack`).
-- Look and colors: the rules are in `UI_STYLE_GUIDE.md`. All colors are variables at the top of `src/main/resources/cs151/view/css/application.css`; indigo is used only for the active sidebar item, primary buttons, focus, links and main progress bars.
+- Look and colors: all colors are variables at the top of `src/main/resources/cs151/view/css/application.css`; indigo is used only for the active sidebar item, primary buttons, focus, links and main progress bars.
 - Icons: Ikonli with FontAwesome 5 only (`<FontIcon iconLiteral="fas-home"/>` in FXML). Do not add emoji or image icons.
 - Font: Inter is bundled in `src/main/resources/cs151/view/fonts/` (license included), so it does not need to be installed on the computer.
 - Pages: each page is one FXML file in `src/main/resources/cs151/view/` with the shared `sidebar-view.fxml` and `topbar-view.fxml`; the shared helpers are `Motion` (animations, toasts), `Pills` (status and category labels), `GoalDialogs`, `WindowChrome` and `WinFrame` (frameless window) in `src/main/java/cs151/view/`.
