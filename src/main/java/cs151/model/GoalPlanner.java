@@ -1,7 +1,11 @@
 package cs151.model;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Main backend API for the frontend. Validates input, enforces the business rules and delegates storage to
@@ -339,9 +343,54 @@ public class GoalPlanner {
      * name or status; tasks on description, priority or status. A blank query returns no results.
      */
     public SearchResults search(String query) {
-        if (query == null || query.isBlank()) return new SearchResults(List.of(), List.of(), List.of());
-        return new SearchResults(dataManager.searchGoals(query), dataManager.searchMilestones(query),
-                dataManager.searchTasks(query));
+        if (query == null || query.isBlank()) {
+            return new SearchResults(List.of(), List.of(), List.of());
+        }
+
+        return new SearchResults(
+                dataManager.searchGoals(query),
+                dataManager.searchMilestones(query),
+                dataManager.searchTasks(query)
+        );
+    }
+
+    /**
+     * Returns every Goal related to the search text.
+     * A Goal is returned when the text matches the Goal itself,
+     * one of its Milestones, or one of its Tasks.
+     * Each Goal appears only once.
+     */
+    public List<Goal> searchRelatedGoals(String query) {
+        SearchResults results = search(query);
+
+        Map<Long, Goal> uniqueGoals = new LinkedHashMap<>();
+
+        for (Goal goal : results.goals()) {
+            uniqueGoals.put(goal.getId(), goal);
+        }
+
+        for (Milestone milestone : results.milestones()) {
+            Goal goal = getGoal(milestone.getGoalId());
+            uniqueGoals.put(goal.getId(), goal);
+        }
+
+        for (Task task : results.tasks()) {
+            Milestone milestone = getMilestone(task.getMilestoneId());
+            Goal goal = getGoal(milestone.getGoalId());
+            uniqueGoals.put(goal.getId(), goal);
+        }
+
+        List<Goal> goals = new ArrayList<>(uniqueGoals.values());
+
+        goals.sort(
+                Comparator.comparing(Goal::getTargetDate)
+                        .thenComparing(
+                                Goal::getName,
+                                String.CASE_INSENSITIVE_ORDER
+                        )
+        );
+
+        return goals;
     }
 
     private static String defaultIfBlank(String value, String fallback) {
