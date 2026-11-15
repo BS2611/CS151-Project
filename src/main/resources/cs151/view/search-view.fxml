@@ -54,9 +54,18 @@
                         </columns>
                     </TableView>
 
-                    <Button text="Back"
-                            onAction="#handleBack"
-                            styleClass="secondary-button"/>
+                    <Label text="Double-click a goal, or select it and click View Milestones, to open its Milestones and Tasks."
+                           styleClass="page-subtitle"/>
+
+                    <HBox spacing="12.0">
+                        <Button text="Back"
+                                onAction="#handleBack"
+                                styleClass="secondary-button"/>
+
+                        <Button text="View Milestones"
+                                onAction="#handleViewMilestones"
+                                styleClass="primary-button"/>
+                    </HBox>
 
                 </VBox>
             </HBox>
