@@ -339,8 +339,8 @@ public class GoalPlanner {
     // ------------------------------------------------------------------ search
 
     /**
-     * Global, case-insensitive search. Goals match on name, description, category or status; milestones on
-     * name or status; tasks on description, priority or status. A blank query returns no results.
+     * Global, case-insensitive search. Goals match on name, description, category, status, dates or progress;
+     * milestones on name, target date or status; tasks on description, due date, priority or status. A blank query returns no results.
      */
     public SearchResults search(String query) {
         if (query == null || query.isBlank()) {

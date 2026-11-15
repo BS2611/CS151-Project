@@ -469,21 +469,22 @@ public class DataManager implements DAL {
         });
     }
 
-    /** Goals whose name, description, category or status contains the text (case-insensitive). */
+    /** Goals whose name, description, category, status, target date, creation date or progress contains the text. */
     public List<Goal> searchGoals(String query) {
-        return searchTable("goals", new String[]{"name", "description", "category", "status"},
+        return searchTable("goals", new String[]{"name", "description", "category", "status", "target_date",
+                        "creation_date", "CAST(progress AS TEXT)"},
                 "target_date, name", query, DataManager::mapGoal);
     }
 
-    /** Milestones whose name or status contains the text (case-insensitive). */
+    /** Milestones whose name, target date or status contains the text (case-insensitive). */
     public List<Milestone> searchMilestones(String query) {
-        return searchTable("milestones", new String[]{"name", "status"}, "target_date, name", query,
+        return searchTable("milestones", new String[]{"name", "target_date", "status"}, "target_date, name", query,
                 DataManager::mapMilestone);
     }
 
-    /** Tasks whose description, priority or status contains the text (case-insensitive). */
+    /** Tasks whose description, due date, priority or status contains the text (case-insensitive). */
     public List<Task> searchTasks(String query) {
-        return searchTable("tasks", new String[]{"description", "priority", "status"}, "due_date, description",
+        return searchTable("tasks", new String[]{"description", "due_date", "priority", "status"}, "due_date, description",
                 query, DataManager::mapTask);
     }
 }
