@@ -74,4 +74,81 @@ class GlobalSearchTest extends BackendTestBase {
         assertTrue(planner.searchRelatedGoals("   ").isEmpty());
         assertTrue(planner.searchRelatedGoals(null).isEmpty());
     }
+
+    @Test
+    void goalFieldMatchReturnsOnlyThatGoal() {
+        Goal match = planner.createGoal("Alpha Goal", "Learn zebra stripes", "Career", today.plusDays(30));
+        planner.createGoal("Beta Goal", "Something else", "Health", today.plusDays(31));
+
+        assertEquals(List.of(match.getId()), ids(planner.searchRelatedGoals("zebra")));   // description
+        assertEquals(List.of(match.getId()), ids(planner.searchRelatedGoals("career")));  // category
+        assertEquals(List.of(match.getId()), ids(planner.searchRelatedGoals("alpha")));   // name
+    }
+
+    @Test
+    void milestoneFieldMatchReturnsItsGoalOnce() {
+        Goal parent = newGoal("Parent Goal");
+        newMilestone(parent, "Quarterly Review");
+        newMilestone(parent, "Quarterly Planning");
+        Goal other = newGoal("Other Goal");
+        newMilestone(other, "Warm Up");
+
+        assertEquals(List.of(parent.getId()), ids(planner.searchRelatedGoals("quarterly")));
+    }
+
+    @Test
+    void taskFieldsMatchTheirGoal() {
+        Goal parent = newGoal("Parent Goal");
+        Milestone milestone = newMilestone(parent, "Milestone One");
+        planner.createTask(milestone.getId(), "Write report", today.plusDays(5), "High", "In Progress");
+        Goal other = newGoal("Other Goal");
+        planner.createTask(newMilestone(other, "Milestone Two").getId(), "Read book", today.plusDays(6), "Low", "To Do");
+
+        assertEquals(List.of(parent.getId()), ids(planner.searchRelatedGoals("high")));         // priority
+        assertEquals(List.of(parent.getId()), ids(planner.searchRelatedGoals("in progress")));  // status
+        assertEquals(List.of(parent.getId()), ids(planner.searchRelatedGoals("write report"))); // description
+    }
+
+    @Test
+    void datesAreSearchable() {
+        Goal goal = planner.createGoal("Dated Goal", "desc", "Academic", today.plusDays(300));
+        Milestone milestone = planner.createMilestone(goal.getId(), "Dated Milestone", today.plusDays(200), null);
+        planner.createTask(milestone.getId(), "Dated Task", today.plusDays(100), null, null);
+        Goal other = newGoal("Other Goal");
+
+        assertEquals(List.of(goal.getId()), ids(planner.searchRelatedGoals(today.plusDays(300).toString())));
+        assertEquals(List.of(goal.getId()), ids(planner.searchRelatedGoals(today.plusDays(200).toString())));
+        assertEquals(List.of(goal.getId()), ids(planner.searchRelatedGoals(today.plusDays(100).toString())));
+        assertEquals(List.of(goal.getId()), ids(planner.searchRelatedGoals(today.plusDays(100).toString() + "  ")));
+        assertTrue(planner.searchRelatedGoals(today.plusDays(400).toString()).isEmpty());
+        assertEquals(other.getId(), planner.searchRelatedGoals(today.plusDays(30).toString()).get(0).getId());
+    }
+
+    @Test
+    void goalProgressIsSearchableAsText() {
+        Goal half = planner.createGoal("Half Done", "desc", "Academic", today.plusDays(30), "In Progress", 73);
+        planner.createGoal("Just Started", "desc", "Academic", today.plusDays(31), "Not Started", 0);
+
+        assertEquals(List.of(half.getId()), ids(planner.searchRelatedGoals("73")));
+    }
+
+    @Test
+    void noMatchReturnsEmptyList() {
+        Goal goal = newGoal("Some Goal");
+        newTask(newMilestone(goal, "Some Milestone"), "Some Task");
+
+        assertTrue(planner.searchRelatedGoals("zzz-nothing").isEmpty());
+        assertTrue(planner.searchRelatedGoals("%").isEmpty());
+    }
+
+    @Test
+    void surroundingSpacesAreIgnored() {
+        Goal goal = newGoal("Needle Goal");
+
+        assertEquals(List.of(goal.getId()), ids(planner.searchRelatedGoals("   NEEDLE   ")));
+    }
+
+    private static List<Long> ids(List<Goal> goals) {
+        return goals.stream().map(Goal::getId).toList();
+    }
 }
