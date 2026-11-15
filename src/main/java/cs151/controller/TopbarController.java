@@ -12,6 +12,9 @@ import javafx.fxml.FXML;
 import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.control.ListCell;
+import javafx.scene.control.OverrunStyle;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import javafx.scene.control.ListView;
 import javafx.scene.input.KeyCode;
 import javafx.stage.Popup;
@@ -37,7 +40,7 @@ import java.io.IOException;
 public class TopbarController {
 
     private static final int PER_KIND = 4;
-    private static final double ROW_HEIGHT = 40;
+    private static final double ROW_HEIGHT = 52;
 
     /** One line of the pop-up: kind badge, text, small detail and what happens on click (null = not clickable). */
     private record Suggestion(String kind, String text, String detail, Runnable open) {
@@ -128,22 +131,34 @@ public class TopbarController {
                     setText(null);
                     return;
                 }
-                HBox row = new HBox(10);
+                HBox row = new HBox(12);
                 row.setAlignment(Pos.CENTER_LEFT);
                 if (!item.kind().isEmpty()) {
                     Label kind = new Label(item.kind());
                     kind.getStyleClass().add("suggest-kind");
+                    kind.setMinWidth(76);
+                    kind.setAlignment(Pos.CENTER);
                     row.getChildren().add(kind);
                 }
+                // Title on the first line and the parent (smaller, grey) below it; long text is cut with "...".
+                VBox lines = new VBox(1);
                 Label text = new Label(item.text());
                 text.getStyleClass().add("suggest-text");
-                row.getChildren().add(text);
+                text.setMaxWidth(Double.MAX_VALUE);
+                text.setTextOverrun(OverrunStyle.ELLIPSIS);
+                lines.getChildren().add(text);
                 if (!item.detail().isEmpty()) {
                     Label detail = new Label(item.detail());
                     detail.getStyleClass().add("suggest-detail");
-                    row.getChildren().add(detail);
+                    detail.setMaxWidth(Double.MAX_VALUE);
+                    detail.setTextOverrun(OverrunStyle.ELLIPSIS);
+                    lines.getChildren().add(detail);
                 }
+                HBox.setHgrow(lines, Priority.ALWAYS);
+                lines.setMinWidth(0);
+                row.getChildren().add(lines);
                 setGraphic(row);
+                setPrefWidth(0); // the cell follows the list width, so there is no horizontal scroll bar
             }
         });
         suggestionList.setOnMouseClicked(event -> openSelected());
@@ -204,7 +219,7 @@ public class TopbarController {
 
         suggestionList.getItems().setAll(items);
         suggestionList.getSelectionModel().clearSelection();
-        suggestionList.setPrefWidth(Math.max(searchField.getWidth(), 380));
+        suggestionList.setPrefWidth(Math.max(searchField.getWidth(), 440));
         suggestionList.setPrefHeight(Math.min(items.size(), 9) * ROW_HEIGHT + 12);
 
         Point2D spot = searchField.localToScreen(0, searchField.getHeight() + 4);
