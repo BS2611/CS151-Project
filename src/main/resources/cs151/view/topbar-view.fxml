@@ -18,7 +18,7 @@
     <HBox fx:id="crumbBox" alignment="CENTER_LEFT" spacing="8.0" HBox.hgrow="ALWAYS" minWidth="-Infinity"/>
 
     <StackPane prefWidth="260.0" minWidth="80.0" alignment="CENTER_LEFT">
-        <TextField fx:id="searchField" promptText="Search goals..." styleClass="topbar-search" onAction="#search"/>
+        <TextField fx:id="searchField" promptText="Search goals, milestones, tasks..." styleClass="topbar-search" onAction="#search"/>
         <FontIcon iconLiteral="fas-search" styleClass="field-icon" mouseTransparent="true" StackPane.alignment="CENTER_LEFT">
             <StackPane.margin><Insets left="14"/></StackPane.margin>
         </FontIcon>
