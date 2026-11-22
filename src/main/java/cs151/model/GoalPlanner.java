@@ -18,15 +18,23 @@ public class GoalPlanner {
     //Goal persistence uses the DAL abstraction so storage can be changed to db later.
     private final DAL goalDal;
 
-    /** Uses the sqlite to store goals. */
+    /** Uses SQLite (the default database file) for everything. */
     public GoalPlanner() {
-        this.dataManager = new DataManager();
-        this.goalDal = new DataManager();
+        this(new DataManager());
     }
 
+    /** Uses the given SQLite {@link DataManager} for everything, goals included. */
     public GoalPlanner(DataManager dataManager) {
+        this(dataManager, dataManager);
+    }
+
+    /**
+     * Stores goals through the given {@link DAL} (for example {@link FileSystemDAL}) while milestones, tasks,
+     * progress entries and search still use the SQLite {@link DataManager}.
+     */
+    public GoalPlanner(DAL goalDal, DataManager dataManager) {
+        this.goalDal = goalDal;
         this.dataManager = dataManager;
-        this.goalDal = dataManager;
     }
 
     // ------------------------------------------------------------------ goals
