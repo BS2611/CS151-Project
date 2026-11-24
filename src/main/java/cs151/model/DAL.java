@@ -6,7 +6,7 @@ import java.util.Optional;
 /**
  * Data access layer: the <em>strategy</em> interface for storing goals, milestones, tasks and progress entries.
  * {@link GoalPlanner} and {@link ReportGenerator} depend only on this interface, so the storage (SQLite in
- * {@link DataManager}, a text file in {@link FileSystemDAL}) can be replaced without changing the business rules.
+ * {@link SqliteDAL}, a text file in {@link FileSystemDAL}) can be replaced without changing the business rules.
  *
  * <p>Every implementation follows the same rules:
  * <ul>

@@ -12,7 +12,7 @@ public abstract class BackendTestBase {
     protected Path tempDir;
 
     protected Path dbPath;
-    protected DataManager dataManager;
+    protected SqliteDAL sqliteDal;
     protected GoalPlanner planner;
     protected ReportGenerator reports;
 
@@ -21,9 +21,9 @@ public abstract class BackendTestBase {
     @BeforeEach
     void setUpBackend() {
         dbPath = tempDir.resolve("test.db");
-        dataManager = new DataManager(dbPath);
-        planner = new GoalPlanner(dataManager);
-        reports = new ReportGenerator(dataManager);
+        sqliteDal = new SqliteDAL(dbPath);
+        planner = new GoalPlanner(sqliteDal);
+        reports = new ReportGenerator(sqliteDal);
     }
 
     protected Goal newGoal(String name) {

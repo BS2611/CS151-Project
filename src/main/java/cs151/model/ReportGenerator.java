@@ -14,7 +14,7 @@ public class ReportGenerator {
     private final DAL dal;
 
     public ReportGenerator() {
-        this(new DataManager());
+        this(new SqliteDAL());
     }
 
     /** Reads the data through the given {@link DAL}, so the reports work with any storage. */

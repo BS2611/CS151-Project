@@ -23,7 +23,7 @@ import java.util.Optional;
  * <p>Insert methods set the generated id on the passed model object and also return it. Update/delete methods
  * return whether a row was affected. Each write runs in its own transaction and is rolled back on failure.
  */
-public class DataManager implements DAL {
+public class SqliteDAL implements DAL {
     /** Default runtime database location, relative to the application's working directory. */
     public static final Path DEFAULT_DB_PATH = Paths.get("data", "my-goal-tracker.db");
 
@@ -82,12 +82,12 @@ public class DataManager implements DAL {
     private final String url;
 
     /** Uses the default database file {@code data/my-goal-tracker.db}. */
-    public DataManager() {
+    public SqliteDAL() {
         this(DEFAULT_DB_PATH);
     }
 
     /** Uses the given database file, creating its directory, the file and the tables if needed. */
-    public DataManager(Path dbPath) {
+    public SqliteDAL(Path dbPath) {
         try {
             Path absolute = dbPath.toAbsolutePath();
             if (absolute.getParent() != null) {
@@ -273,20 +273,20 @@ public class DataManager implements DAL {
 
     @Override
     public Optional<Goal> findGoalById(long goalId) {
-        return queryOne("SELECT * FROM goals WHERE id = ?", goalId, DataManager::mapGoal);
+        return queryOne("SELECT * FROM goals WHERE id = ?", goalId, SqliteDAL::mapGoal);
     }
 
     /** Exact (case-sensitive) match on the trimmed name. */
     @Override
     public Optional<Goal> findGoalByName(String name) {
         List<Goal> found = queryList("SELECT * FROM goals WHERE name = ?", name == null ? "" : name.trim(),
-                DataManager::mapGoal);
+                SqliteDAL::mapGoal);
         return found.isEmpty() ? Optional.empty() : Optional.of(found.get(0));
     }
 
     @Override
     public List<Goal> getAllGoals() {
-        return queryList("SELECT * FROM goals ORDER BY target_date, name", null, DataManager::mapGoal);
+        return queryList("SELECT * FROM goals ORDER BY target_date, name", null, SqliteDAL::mapGoal);
     }
 
     // ------------------------------------------------------------------ milestones
@@ -335,13 +335,13 @@ public class DataManager implements DAL {
 
     @Override
     public Optional<Milestone> findMilestoneById(long milestoneId) {
-        return queryOne("SELECT * FROM milestones WHERE id = ?", milestoneId, DataManager::mapMilestone);
+        return queryOne("SELECT * FROM milestones WHERE id = ?", milestoneId, SqliteDAL::mapMilestone);
     }
 
     @Override
     public List<Milestone> getMilestonesForGoal(long goalId) {
         return queryList("SELECT * FROM milestones WHERE goal_id = ? ORDER BY target_date, name", goalId,
-                DataManager::mapMilestone);
+                SqliteDAL::mapMilestone);
     }
 
     // ------------------------------------------------------------------ tasks
@@ -396,13 +396,13 @@ public class DataManager implements DAL {
 
     @Override
     public Optional<Task> findTaskById(long taskId) {
-        return queryOne("SELECT * FROM tasks WHERE id = ?", taskId, DataManager::mapTask);
+        return queryOne("SELECT * FROM tasks WHERE id = ?", taskId, SqliteDAL::mapTask);
     }
 
     @Override
     public List<Task> getTasksForMilestone(long milestoneId) {
         return queryList("SELECT * FROM tasks WHERE milestone_id = ? ORDER BY due_date, description", milestoneId,
-                DataManager::mapTask);
+                SqliteDAL::mapTask);
     }
 
     // ------------------------------------------------------------------ progress entries
@@ -447,13 +447,13 @@ public class DataManager implements DAL {
 
     @Override
     public Optional<ProgressEntry> findProgressEntryById(long entryId) {
-        return queryOne("SELECT * FROM progress_entries WHERE id = ?", entryId, DataManager::mapProgress);
+        return queryOne("SELECT * FROM progress_entries WHERE id = ?", entryId, SqliteDAL::mapProgress);
     }
 
     @Override
     public List<ProgressEntry> getProgressEntriesForTask(long taskId) {
         return queryList("SELECT * FROM progress_entries WHERE task_id = ? ORDER BY entry_date, id", taskId,
-                DataManager::mapProgress);
+                SqliteDAL::mapProgress);
     }
 
     // ------------------------------------------------------------------ search
@@ -495,20 +495,20 @@ public class DataManager implements DAL {
     public List<Goal> searchGoals(String query) {
         return searchTable("goals", new String[]{"name", "description", "category", "status", "target_date",
                         "creation_date", "CAST(progress AS TEXT)"},
-                "target_date, name", query, DataManager::mapGoal);
+                "target_date, name", query, SqliteDAL::mapGoal);
     }
 
     /** Milestones whose name, target date or status contains the text (case-insensitive). */
     @Override
     public List<Milestone> searchMilestones(String query) {
         return searchTable("milestones", new String[]{"name", "target_date", "status"}, "target_date, name", query,
-                DataManager::mapMilestone);
+                SqliteDAL::mapMilestone);
     }
 
     /** Tasks whose description, due date, priority or status contains the text (case-insensitive). */
     @Override
     public List<Task> searchTasks(String query) {
         return searchTable("tasks", new String[]{"description", "due_date", "priority", "status"}, "due_date, description",
-                query, DataManager::mapTask);
+                query, SqliteDAL::mapTask);
     }
 }

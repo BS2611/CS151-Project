@@ -19,7 +19,7 @@ import java.util.function.Predicate;
  * record ({@code G}oal, {@code M}ilestone, {@code T}ask, {@code P}rogress entry). A backslash escapes {@code |},
  * line breaks and itself inside a field, so any text can be stored. Ids are (highest stored id of that kind + 1).
  *
- * <p>It follows exactly the same rules as {@link DataManager} (see {@link DAL}): unique names, parent must exist,
+ * <p>It follows exactly the same rules as {@link SqliteDAL} (see {@link DAL}): unique names, parent must exist,
  * cascading deletes and the same sort orders, so {@link GoalPlanner} behaves the same with either one.
  */
 public class FileSystemDAL implements DAL {

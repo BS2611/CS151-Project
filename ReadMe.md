@@ -3,7 +3,7 @@
 # Who did What
 
 # Technical-Spec Final
-1. Bhavpreet Singh: Fixed the design-pattern problem in the model. The DAL interface now covers goals, milestones, tasks, progress entries and search; GoalPlanner and ReportGenerator depend only on DAL (no concrete DataManager); DataManager (SQLite) and FileSystemDAL (text file, data/tracker.txt) are two complete implementations; added contract tests that run against both. Drew the polymorphism and class design pattern diagrams and updated the complete class diagram.
+1. Bhavpreet Singh: Fixed the design-pattern problem in the model. The DAL interface now covers goals, milestones, tasks, progress entries and search; GoalPlanner and ReportGenerator depend only on DAL (no concrete SqliteDAL); SqliteDAL (SQLite) and FileSystemDAL (text file, data/tracker.txt) are two complete implementations; added contract tests that run against both. Drew the polymorphism and class design pattern diagrams and updated the complete class diagram.
 
 # Version 0.9
 1. Keerat Kaur: Created the Search page UI (global search bar and results TableView) with the Search button on the Home page, and seeded the 3 Goals with 3 Milestones each.
@@ -74,7 +74,7 @@ Search: on the Home page click "Search" to open the Global Search page. Type tex
 
 ## MVC Design
 The application has exactly three MVC packages, each a single flat package: 'cs151.model', 'cs151.view' and 'cs151.controller'. 'cs151.application.Main' is only the entry point and is not part of M, V or C.
-- Model ('cs151.model'): the POJOs (Goal, Milestone, Task, ProgressEntry), the business rules (GoalPlanner, ReportGenerator, SeedData), the persistence strategy (the DAL interface with two implementations: DataManager for SQLite, which the application uses, and FileSystemDAL for a text file), the data transfer objects (for example GoalNode and OverallSummary) and the exceptions.
+- Model ('cs151.model'): the POJOs (Goal, Milestone, Task, ProgressEntry), the business rules (GoalPlanner, ReportGenerator, SeedData), the persistence strategy (the DAL interface with two implementations: SqliteDAL for SQLite, which the application uses, and FileSystemDAL for a text file), the data transfer objects (for example GoalNode and OverallSummary) and the exceptions.
 - View ('cs151.view'): the FXML pages, CSS and fonts under 'src/main/resources/cs151/view', plus the UI helper classes (Motion, Pills, GoalDialogs, WindowChrome, WinFrame) that build and animate what the user sees.
 - Controller ('cs151.controller'): the *Controller classes handle user actions, collect form data, call the model, display feedback, and navigate between views.
 - 'Main' starts the JavaFX application and loads the appropriate views. Controllers communicate with 'GoalPlanner' rather than accessing SQLite directly, and the model does not depend on JavaFX, view or controller classes.

@@ -10,7 +10,7 @@ import java.util.Map;
 /**
  * Main backend API for the frontend (the <em>Facade</em> of the model). Validates input, enforces the business rules
  * and delegates all storage to a {@link DAL} (the <em>Strategy</em>), so it works the same with
- * {@link DataManager} (SQLite) or {@link FileSystemDAL} (text file). Every method either returns the saved/loaded
+ * {@link SqliteDAL} (SQLite) or {@link FileSystemDAL} (text file). Every method either returns the saved/loaded
  * object or throws a {@link ValidationException} (or subclass) whose message can be shown to the user directly.
  */
 public class GoalPlanner {
@@ -18,7 +18,7 @@ public class GoalPlanner {
 
     /** Uses SQLite (the default database file) for everything. */
     public GoalPlanner() {
-        this(new DataManager());
+        this(new SqliteDAL());
     }
 
     /** Uses the given {@link DAL} for everything (goals, milestones, tasks, progress entries and search). */

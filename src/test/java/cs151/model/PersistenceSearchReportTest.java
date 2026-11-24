@@ -17,7 +17,7 @@ class PersistenceSearchReportTest extends BackendTestBase {
         Task t = newTask(m, "T");
         planner.addProgressEntry(t.getId(), "note");
 
-        GoalPlanner reloaded = new GoalPlanner(new DataManager(dbPath));
+        GoalPlanner reloaded = new GoalPlanner(new SqliteDAL(dbPath));
         assertEquals("Persistent", reloaded.getGoal(g.getId()).getName());
         assertEquals(1, reloaded.getMilestonesForGoal(g.getId()).size());
         assertEquals(1, reloaded.getTasksForMilestone(m.getId()).size());
@@ -35,11 +35,11 @@ class PersistenceSearchReportTest extends BackendTestBase {
 
         planner.deleteGoal(g.getId());
 
-        assertTrue(dataManager.findGoalById(g.getId()).isEmpty());
-        assertTrue(dataManager.findMilestoneById(m.getId()).isEmpty());
-        assertTrue(dataManager.findTaskById(t.getId()).isEmpty());
-        assertTrue(dataManager.findProgressEntryById(entryId).isEmpty());
-        assertTrue(dataManager.findMilestoneById(otherM.getId()).isPresent());
+        assertTrue(sqliteDal.findGoalById(g.getId()).isEmpty());
+        assertTrue(sqliteDal.findMilestoneById(m.getId()).isEmpty());
+        assertTrue(sqliteDal.findTaskById(t.getId()).isEmpty());
+        assertTrue(sqliteDal.findProgressEntryById(entryId).isEmpty());
+        assertTrue(sqliteDal.findMilestoneById(otherM.getId()).isPresent());
     }
 
     @Test
@@ -49,19 +49,19 @@ class PersistenceSearchReportTest extends BackendTestBase {
         long entryId = planner.addProgressEntry(t.getId(), "n").getId();
 
         planner.deleteTask(t.getId());
-        assertTrue(dataManager.findProgressEntryById(entryId).isEmpty());
+        assertTrue(sqliteDal.findProgressEntryById(entryId).isEmpty());
 
         Task t2 = newTask(m, "T2");
         planner.deleteMilestone(m.getId());
-        assertTrue(dataManager.findTaskById(t2.getId()).isEmpty());
+        assertTrue(sqliteDal.findTaskById(t2.getId()).isEmpty());
     }
 
     @Test
     void databaseRejectsInvalidRowsEvenIfServiceIsBypassed() {
         Goal bad = new Goal("Bad", "", "Other", today, "Completed", 50);
-        assertThrows(RuntimeException.class, () -> dataManager.insertGoal(bad));
+        assertThrows(RuntimeException.class, () -> sqliteDal.insertGoal(bad));
         Milestone orphan = new Milestone(777, "M", today, "Not Started");
-        assertThrows(RuntimeException.class, () -> dataManager.insertMilestone(orphan));
+        assertThrows(RuntimeException.class, () -> sqliteDal.insertMilestone(orphan));
     }
 
     @Test
@@ -159,18 +159,18 @@ class PersistenceSearchReportTest extends BackendTestBase {
         OverdueItems none = reports.overdueItems();
         assertTrue(none.goals().isEmpty() && none.milestones().isEmpty() && none.tasks().isEmpty());
 
-        // Move the clock-relevant dates into the past by writing directly through DataManager.
+        // Move the clock-relevant dates into the past by writing directly through SqliteDAL.
         LocalDate past = today.minusDays(3);
-        Goal gPast = dataManager.findGoalById(g.getId()).orElseThrow();
+        Goal gPast = sqliteDal.findGoalById(g.getId()).orElseThrow();
         gPast.setTargetDate(past);
-        dataManager.updateGoal(gPast);
-        Milestone mPast = dataManager.findMilestoneById(m.getId()).orElseThrow();
+        sqliteDal.updateGoal(gPast);
+        Milestone mPast = sqliteDal.findMilestoneById(m.getId()).orElseThrow();
         mPast.setTargetDate(past);
-        dataManager.updateMilestone(mPast);
+        sqliteDal.updateMilestone(mPast);
         for (Task t : List.of(open, done, cancelled)) {
-            Task loaded = dataManager.findTaskById(t.getId()).orElseThrow();
+            Task loaded = sqliteDal.findTaskById(t.getId()).orElseThrow();
             loaded.setDueDate(past);
-            dataManager.updateTask(loaded);
+            sqliteDal.updateTask(loaded);
         }
 
         OverdueItems overdue = reports.overdueItems();
