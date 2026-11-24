@@ -19,7 +19,12 @@ import java.util.List;
 
 public class SearchController {
 
-    private final GoalPlanner goalPlanner = new GoalPlanner();
+    private final GoalPlanner goalPlanner;
+
+    /** Receives the one shared {@link GoalPlanner} (dependency injection, see {@code Main}). */
+    public SearchController(GoalPlanner goalPlanner) {
+        this.goalPlanner = goalPlanner;
+    }
 
     @FXML
     private TextField searchField;
@@ -46,13 +51,13 @@ public class SearchController {
 
         categoryColumn.setCellValueFactory(cell ->
                 new ReadOnlyStringWrapper(
-                        cell.getValue().getCategory()
+                        cell.getValue().getCategory().label()
                 )
         );
 
         statusColumn.setCellValueFactory(cell ->
                 new ReadOnlyStringWrapper(
-                        cell.getValue().getStatus()
+                        cell.getValue().getStatus().label()
                 )
         );
 

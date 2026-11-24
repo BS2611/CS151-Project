@@ -17,15 +17,15 @@ class GoalEditDeleteSeedTest extends BackendTestBase {
         Goal g = newGoal("Original");
         LocalDate newCreation = today.minusDays(10);
 
-        planner.updateGoal(g.getId(), "Renamed", "new description", "Career", today.plusDays(40),
-                "In Progress", 25, newCreation);
+        planner.updateGoal(g.getId(), "Renamed", "new description", GoalCategory.CAREER, today.plusDays(40),
+                GoalStatus.IN_PROGRESS, 25, newCreation);
 
         Goal stored = planner.getGoal(g.getId());
         assertEquals("Renamed", stored.getName());
         assertEquals("new description", stored.getDescription());
-        assertEquals("Career", stored.getCategory());
+        assertEquals(GoalCategory.CAREER, stored.getCategory());
         assertEquals(today.plusDays(40), stored.getTargetDate());
-        assertEquals("In Progress", stored.getStatus());
+        assertEquals(GoalStatus.IN_PROGRESS, stored.getStatus());
         assertEquals(25, stored.getProgress());
         assertEquals(newCreation, stored.getCreationDate());
     }
@@ -35,7 +35,7 @@ class GoalEditDeleteSeedTest extends BackendTestBase {
         Goal g = newGoal("Keep");
         LocalDate original = g.getCreationDate();
 
-        planner.updateGoal(g.getId(), "Keep", "", "Academic", today.plusDays(30), "Not Started", 0);
+        planner.updateGoal(g.getId(), "Keep", "", GoalCategory.ACADEMIC, today.plusDays(30), GoalStatus.NOT_STARTED, 0);
 
         assertEquals(original, planner.getGoal(g.getId()).getCreationDate());
     }
@@ -44,10 +44,10 @@ class GoalEditDeleteSeedTest extends BackendTestBase {
     void creationDateIsRequiredAndCannotBeInTheFuture() {
         Goal g = newGoal("Dates");
 
-        assertThrows(ValidationException.class, () -> planner.updateGoal(g.getId(), "Dates", "", "Academic",
-                today.plusDays(30), "Not Started", 0, null));
-        assertThrows(ValidationException.class, () -> planner.updateGoal(g.getId(), "Dates", "", "Academic",
-                today.plusDays(30), "Not Started", 0, today.plusDays(1)));
+        assertThrows(ValidationException.class, () -> planner.updateGoal(g.getId(), "Dates", "", GoalCategory.ACADEMIC,
+                today.plusDays(30), GoalStatus.NOT_STARTED, 0, null));
+        assertThrows(ValidationException.class, () -> planner.updateGoal(g.getId(), "Dates", "", GoalCategory.ACADEMIC,
+                today.plusDays(30), GoalStatus.NOT_STARTED, 0, today.plusDays(1)));
     }
 
     @Test

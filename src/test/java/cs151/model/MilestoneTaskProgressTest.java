@@ -18,7 +18,7 @@ class MilestoneTaskProgressTest extends BackendTestBase {
         Goal g = newGoal("G");
         Milestone m = planner.createMilestone(g.getId(), "  M1 ", today.plusDays(5), null);
         assertEquals("M1", planner.getMilestone(m.getId()).getMilestoneName());
-        assertEquals("Not Started", m.getStatus());
+        assertEquals(MilestoneStatus.NOT_STARTED, m.getStatus());
         assertEquals(1, planner.getMilestonesForGoal(g.getId()).size());
     }
 
@@ -82,8 +82,8 @@ class MilestoneTaskProgressTest extends BackendTestBase {
     @Test
     void markMilestoneCompleted() {
         Milestone m = newMilestone(newGoal("G"), "M");
-        assertEquals("Completed", planner.markMilestoneCompleted(m.getId()).getStatus());
-        assertEquals("Completed", planner.getMilestone(m.getId()).getStatus());
+        assertEquals(MilestoneStatus.COMPLETED, planner.markMilestoneCompleted(m.getId()).getStatus());
+        assertEquals(MilestoneStatus.COMPLETED, planner.getMilestone(m.getId()).getStatus());
     }
 
     // ---------------- tasks
@@ -94,8 +94,8 @@ class MilestoneTaskProgressTest extends BackendTestBase {
         Task t = planner.createTask(m.getId(), "  Write code ", today.plusDays(2), null, null);
         Task loaded = planner.getTask(t.getId());
         assertEquals("Write code", loaded.getDescription());
-        assertEquals("Medium", loaded.getPriority());
-        assertEquals("To Do", loaded.getStatus());
+        assertEquals(TaskPriority.MEDIUM, loaded.getPriority());
+        assertEquals(TaskStatus.TO_DO, loaded.getStatus());
         assertNull(loaded.getCompletionDate());
     }
 
@@ -132,23 +132,26 @@ class MilestoneTaskProgressTest extends BackendTestBase {
     void leavingCompletedClearsCompletionDate() {
         Task t = newTask(newMilestone(newGoal("G"), "M"), "T");
         planner.markTaskCompleted(t.getId());
-        Task reopened = planner.updateTask(t.getId(), "T", t.getDueDate(), "High", "In Progress");
+        Task reopened = planner.updateTask(t.getId(), "T", t.getDueDate(), TaskPriority.HIGH, TaskStatus.IN_PROGRESS);
         assertNull(reopened.getCompletionDate());
         assertNull(planner.getTask(t.getId()).getCompletionDate());
-        assertEquals("High", planner.getTask(t.getId()).getPriority());
+        assertEquals(TaskPriority.HIGH, planner.getTask(t.getId()).getPriority());
     }
 
     @Test
     void createdAsCompletedGetsCompletionDate() {
         Milestone m = newMilestone(newGoal("G"), "M");
-        Task t = planner.createTask(m.getId(), "T", today, "Low", "Completed");
+        Task t = planner.createTask(m.getId(), "T", today, TaskPriority.LOW, TaskStatus.COMPLETED);
         assertEquals(today, t.getCompletionDate());
     }
 
     @Test
-    void invalidPriorityRejected() {
+    void missingPriorityAndStatusGetTheDefaults() {
+        // an unknown priority cannot be written any more: the enum type makes it a compile error
         Milestone m = newMilestone(newGoal("G"), "M");
-        assertThrows(ValidationException.class, () -> planner.createTask(m.getId(), "T", today, "Urgent", null));
+        Task t = planner.createTask(m.getId(), "T", today, null, null);
+        assertEquals(TaskPriority.MEDIUM, t.getPriority());
+        assertEquals(TaskStatus.TO_DO, t.getStatus());
     }
 
     /** v0.7: tasks are listed with the soonest due date first. */

@@ -24,16 +24,32 @@ import java.util.Optional;
 public interface DAL {
     // ------------------------------------------------------------------ goals
 
-    /** Stores a new goal, sets its generated id and returns the id. */
+    /**
+     * Stores a new goal, sets its generated id and returns the id.
+     *
+     * @precondition goal is not null and its name is not used by another goal
+     * @postcondition the goal can be found by the returned id
+     * @throws DuplicateEntityException if the name is already used
+     */
     long insertGoal(Goal goal);
 
     /** Returns all goals, soonest target date first (then by name). */
     List<Goal> getAllGoals();
 
-    /** Saves the changes of an existing goal; returns whether a goal was updated. */
+    /**
+     * Saves the changes of an existing goal; returns whether a goal was updated.
+     *
+     * @precondition goal is not null
+     * @postcondition if true is returned, the stored goal equals the given goal
+     * @throws DuplicateEntityException if the new name is used by another goal
+     */
     boolean updateGoal(Goal goal);
 
-    /** Deletes the goal (and its milestones, tasks and progress entries); returns whether it existed. */
+    /**
+     * Deletes the goal (and its milestones, tasks and progress entries); returns whether it existed.
+     *
+     * @postcondition if true is returned, nothing stored belongs to the goal any more
+     */
     boolean deleteGoal(long goalId);
 
     Optional<Goal> findGoalById(long goalId);
@@ -43,6 +59,12 @@ public interface DAL {
 
     // ------------------------------------------------------------------ milestones
 
+    /**
+     * @precondition the goal of the milestone exists and the name is not used by another milestone of that goal
+     * @postcondition the milestone has its generated id
+     * @throws NotFoundException        if the goal does not exist
+     * @throws DuplicateEntityException if the name is already used in this goal
+     */
     long insertMilestone(Milestone milestone);
 
     boolean updateMilestone(Milestone milestone);
@@ -56,6 +78,12 @@ public interface DAL {
 
     // ------------------------------------------------------------------ tasks
 
+    /**
+     * @precondition the milestone of the task exists and the description is not used by another task of it
+     * @postcondition the task has its generated id
+     * @throws NotFoundException        if the milestone does not exist
+     * @throws DuplicateEntityException if the description is already used in this milestone
+     */
     long insertTask(Task task);
 
     boolean updateTask(Task task);
@@ -69,6 +97,11 @@ public interface DAL {
 
     // ------------------------------------------------------------------ progress entries
 
+    /**
+     * @precondition the task of the entry exists
+     * @postcondition the entry has its generated id
+     * @throws NotFoundException if the task does not exist
+     */
     long insertProgressEntry(ProgressEntry entry);
 
     /** Only the note can change; the entry date is fixed at creation. */

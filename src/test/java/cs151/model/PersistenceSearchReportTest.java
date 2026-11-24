@@ -57,18 +57,19 @@ class PersistenceSearchReportTest extends BackendTestBase {
     }
 
     @Test
-    void databaseRejectsInvalidRowsEvenIfServiceIsBypassed() {
-        Goal bad = new Goal("Bad", "", "Other", today, "Completed", 50);
-        assertThrows(RuntimeException.class, () -> sqliteDal.insertGoal(bad));
-        Milestone orphan = new Milestone(777, "M", today, "Not Started");
+    void invalidObjectsCannotBeCreatedAndOrphansAreRejectedByTheDatabase() {
+        // class invariant: a Completed goal must have 100% progress, so such a Goal cannot even be built
+        assertThrows(ValidationException.class,
+                () -> new Goal("Bad", "", GoalCategory.OTHER, today, GoalStatus.COMPLETED, 50));
+        Milestone orphan = new Milestone(777, "M", today, MilestoneStatus.NOT_STARTED);
         assertThrows(RuntimeException.class, () -> sqliteDal.insertMilestone(orphan));
     }
 
     @Test
     void searchIsCaseInsensitiveAcrossGoalsMilestonesAndTasks() {
-        Goal g = planner.createGoal("Learn Guitar", "Play songs", "Personal", today.plusDays(30));
+        Goal g = planner.createGoal("Learn Guitar", "Play songs", GoalCategory.PERSONAL, today.plusDays(30));
         Milestone m = planner.createMilestone(g.getId(), "Chords GUITAR basics", today.plusDays(5), null);
-        planner.createTask(m.getId(), "practice guitar daily", today.plusDays(2), "High", null);
+        planner.createTask(m.getId(), "practice guitar daily", today.plusDays(2), TaskPriority.HIGH, null);
         newGoal("Unrelated");
 
         SearchResults r = planner.search("gUiTaR");
@@ -88,10 +89,10 @@ class PersistenceSearchReportTest extends BackendTestBase {
 
     @Test
     void reportsGiveCorrectTotalsAndSummaries() {
-        Goal a = planner.createGoal("A", "", "Academic", today.plusDays(30), "In Progress", 50);
-        Goal b = planner.createGoal("B", "", "Academic", today.plusDays(30), "Not Started", 10);
-        Goal c = planner.createGoal("C", "", "Health", today.plusDays(30), "Completed", 100);
-        planner.createGoal("D", "", "Career", today.plusDays(30), "Abandoned", 0);
+        Goal a = planner.createGoal("A", "", GoalCategory.ACADEMIC, today.plusDays(30), GoalStatus.IN_PROGRESS, 50);
+        Goal b = planner.createGoal("B", "", GoalCategory.ACADEMIC, today.plusDays(30), GoalStatus.NOT_STARTED, 10);
+        Goal c = planner.createGoal("C", "", GoalCategory.HEALTH, today.plusDays(30), GoalStatus.COMPLETED, 100);
+        planner.createGoal("D", "", GoalCategory.CAREER, today.plusDays(30), GoalStatus.ABANDONED, 0);
 
         Milestone ma = newMilestone(a, "MA");
         newMilestone(a, "MA2");
@@ -106,22 +107,22 @@ class PersistenceSearchReportTest extends BackendTestBase {
         GoalOverviewRow rowA = overview.stream().filter(r -> r.name().equals("A")).findFirst().orElseThrow();
         assertEquals(2, rowA.milestoneCount());
         assertEquals(2, rowA.taskCount());
-        assertEquals("Academic", rowA.category());
+        assertEquals(GoalCategory.ACADEMIC.label(), rowA.category());
         assertEquals(50, rowA.progress());
 
         Map<String, Integer> status = reports.statusSummary();
-        assertEquals(1, status.get("Not Started"));
-        assertEquals(1, status.get("In Progress"));
-        assertEquals(0, status.get("On Hold"));
-        assertEquals(1, status.get("Completed"));
-        assertEquals(1, status.get("Abandoned"));
+        assertEquals(1, status.get(GoalStatus.NOT_STARTED.label()));
+        assertEquals(1, status.get(GoalStatus.IN_PROGRESS.label()));
+        assertEquals(0, status.get(GoalStatus.ON_HOLD.label()));
+        assertEquals(1, status.get(GoalStatus.COMPLETED.label()));
+        assertEquals(1, status.get(GoalStatus.ABANDONED.label()));
 
         List<CategorySummaryRow> cats = reports.categorySummary();
         assertEquals(6, cats.size());
-        CategorySummaryRow academic = cats.stream().filter(r -> r.category().equals("Academic")).findFirst().orElseThrow();
+        CategorySummaryRow academic = cats.stream().filter(r -> r.category().equals(GoalCategory.ACADEMIC.label())).findFirst().orElseThrow();
         assertEquals(2, academic.goalCount());
         assertEquals(30.0, academic.averageProgress(), 0.0001);
-        assertEquals(0.0, cats.stream().filter(r -> r.category().equals("Financial")).findFirst().orElseThrow()
+        assertEquals(0.0, cats.stream().filter(r -> r.category().equals(GoalCategory.FINANCIAL.label())).findFirst().orElseThrow()
                 .averageProgress(), 0.0001);
 
         OverallSummary summary = reports.overallSummary();
@@ -152,7 +153,7 @@ class PersistenceSearchReportTest extends BackendTestBase {
         Task open = planner.createTask(m.getId(), "open", today.plusDays(5), null, null);
         Task done = planner.createTask(m.getId(), "done", today.plusDays(5), null, null);
         planner.markTaskCompleted(done.getId());
-        Task cancelled = planner.createTask(m.getId(), "cancelled", today.plusDays(5), null, "Cancelled");
+        Task cancelled = planner.createTask(m.getId(), "cancelled", today.plusDays(5), null, TaskStatus.CANCELLED);
         Task future = planner.createTask(m.getId(), "future", today.plusDays(6), null, null);
 
         // Nothing is overdue today.
@@ -162,14 +163,15 @@ class PersistenceSearchReportTest extends BackendTestBase {
         // Move the clock-relevant dates into the past by writing directly through SqliteDAL.
         LocalDate past = today.minusDays(3);
         Goal gPast = sqliteDal.findGoalById(g.getId()).orElseThrow();
-        gPast.setTargetDate(past);
+        gPast.update(gPast.getName(), gPast.getDescription(), gPast.getCategory(), past, gPast.getStatus(),
+                gPast.getProgress());
         sqliteDal.updateGoal(gPast);
         Milestone mPast = sqliteDal.findMilestoneById(m.getId()).orElseThrow();
-        mPast.setTargetDate(past);
+        mPast.update(mPast.getMilestoneName(), past, mPast.getStatus());
         sqliteDal.updateMilestone(mPast);
         for (Task t : List.of(open, done, cancelled)) {
             Task loaded = sqliteDal.findTaskById(t.getId()).orElseThrow();
-            loaded.setDueDate(past);
+            loaded.update(loaded.getDescription(), past, loaded.getPriority(), loaded.getStatus());
             sqliteDal.updateTask(loaded);
         }
 

@@ -3,7 +3,11 @@ package cs151.model;
 import java.time.LocalDate;
 import java.util.Objects;
 
-/** A dated note about work done on a Task (work completed, obstacles or next steps). */
+/**
+ * A dated note about work done on a Task (work completed, obstacles or next steps).
+ *
+ * <p>Class invariant: the note is not empty.
+ */
 public class ProgressEntry {
     private long id;
     private final long taskId;
@@ -30,7 +34,15 @@ public class ProgressEntry {
     public LocalDate getEntryDate() { return entryDate; }
 
     public String getNote() { return note; }
-    public void setNote(String note) { this.note = note == null ? "" : note.trim(); }
+    /**
+     * @precondition note is not blank
+     * @throws ValidationException if the note is blank; the entry is then unchanged
+     */
+    public void setNote(String note) {
+        String clean = note == null ? "" : note.trim();
+        if (clean.isEmpty()) throw new ValidationException("Progress note is required.");
+        this.note = clean;
+    }
 
     @Override
     public boolean equals(Object o) {

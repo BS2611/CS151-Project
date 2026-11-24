@@ -222,7 +222,8 @@ public class SqliteDAL implements DAL {
 
     private static Goal mapGoal(ResultSet rs) throws SQLException {
         return new Goal(rs.getLong("id"), rs.getString("name"), rs.getString("description"),
-                rs.getString("category"), date(rs, "target_date"), rs.getString("status"),
+                GoalCategory.fromLabel(rs.getString("category")), date(rs, "target_date"),
+                GoalStatus.fromLabel(rs.getString("status")),
                 rs.getInt("progress"), date(rs, "creation_date"));
     }
 
@@ -234,9 +235,9 @@ public class SqliteDAL implements DAL {
                             + "VALUES (?, ?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS)) {
                 ps.setString(1, goal.getName());
                 ps.setString(2, goal.getDescription());
-                ps.setString(3, goal.getCategory());
+                ps.setString(3, goal.getCategory().label());
                 ps.setString(4, str(goal.getTargetDate()));
-                ps.setString(5, goal.getStatus());
+                ps.setString(5, goal.getStatus().label());
                 ps.setInt(6, goal.getProgress());
                 ps.setString(7, str(goal.getCreationDate()));
                 return insertAndGetId(ps);
@@ -254,9 +255,9 @@ public class SqliteDAL implements DAL {
                             + "progress = ?, creation_date = ? WHERE id = ?")) {
                 ps.setString(1, goal.getName());
                 ps.setString(2, goal.getDescription());
-                ps.setString(3, goal.getCategory());
+                ps.setString(3, goal.getCategory().label());
                 ps.setString(4, str(goal.getTargetDate()));
-                ps.setString(5, goal.getStatus());
+                ps.setString(5, goal.getStatus().label());
                 ps.setInt(6, goal.getProgress());
                 ps.setString(7, str(goal.getCreationDate()));
                 ps.setLong(8, goal.getId());
@@ -293,7 +294,7 @@ public class SqliteDAL implements DAL {
 
     private static Milestone mapMilestone(ResultSet rs) throws SQLException {
         return new Milestone(rs.getLong("id"), rs.getLong("goal_id"), rs.getString("name"),
-                date(rs, "target_date"), rs.getString("status"));
+                date(rs, "target_date"), MilestoneStatus.fromLabel(rs.getString("status")));
     }
 
     @Override
@@ -305,7 +306,7 @@ public class SqliteDAL implements DAL {
                 ps.setLong(1, m.getGoalId());
                 ps.setString(2, m.getMilestoneName());
                 ps.setString(3, str(m.getTargetDate()));
-                ps.setString(4, m.getStatus());
+                ps.setString(4, m.getStatus().label());
                 return insertAndGetId(ps);
             }
         });
@@ -320,7 +321,7 @@ public class SqliteDAL implements DAL {
                     "UPDATE milestones SET name = ?, target_date = ?, status = ? WHERE id = ?")) {
                 ps.setString(1, m.getMilestoneName());
                 ps.setString(2, str(m.getTargetDate()));
-                ps.setString(3, m.getStatus());
+                ps.setString(3, m.getStatus().label());
                 ps.setLong(4, m.getId());
                 return ps.executeUpdate() > 0;
             }
@@ -348,7 +349,8 @@ public class SqliteDAL implements DAL {
 
     private static Task mapTask(ResultSet rs) throws SQLException {
         return new Task(rs.getLong("id"), rs.getLong("milestone_id"), rs.getString("description"),
-                date(rs, "due_date"), rs.getString("priority"), rs.getString("status"),
+                date(rs, "due_date"), TaskPriority.fromLabel(rs.getString("priority")),
+                TaskStatus.fromLabel(rs.getString("status")),
                 date(rs, "completion_date"));
     }
 
@@ -361,8 +363,8 @@ public class SqliteDAL implements DAL {
                 ps.setLong(1, t.getMilestoneId());
                 ps.setString(2, t.getDescription());
                 ps.setString(3, str(t.getDueDate()));
-                ps.setString(4, t.getPriority());
-                ps.setString(5, t.getStatus());
+                ps.setString(4, t.getPriority().label());
+                ps.setString(5, t.getStatus().label());
                 ps.setString(6, str(t.getCompletionDate()));
                 return insertAndGetId(ps);
             }
@@ -379,8 +381,8 @@ public class SqliteDAL implements DAL {
                             + "completion_date = ? WHERE id = ?")) {
                 ps.setString(1, t.getDescription());
                 ps.setString(2, str(t.getDueDate()));
-                ps.setString(3, t.getPriority());
-                ps.setString(4, t.getStatus());
+                ps.setString(3, t.getPriority().label());
+                ps.setString(4, t.getStatus().label());
                 ps.setString(5, str(t.getCompletionDate()));
                 ps.setLong(6, t.getId());
                 return ps.executeUpdate() > 0;

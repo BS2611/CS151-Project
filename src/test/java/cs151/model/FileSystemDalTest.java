@@ -22,7 +22,7 @@ class FileSystemDalTest extends DalContractTest {
 
     @Test
     void everythingIsStillThereAfterReopeningTheFile() {
-        Goal g = planner.createGoal("Persist", "d", "Other", today.plusDays(30), null, 0);
+        Goal g = planner.createGoal("Persist", "d", GoalCategory.OTHER, today.plusDays(30), null, 0);
         Milestone m = planner.createMilestone(g.getId(), "M", today.plusDays(10), null);
         Task t = planner.createTask(m.getId(), "T", today.plusDays(5), null, null);
         planner.addProgressEntry(t.getId(), "note");
@@ -37,17 +37,17 @@ class FileSystemDalTest extends DalContractTest {
 
     @Test
     void idsAreNotReusedAfterADelete() {
-        Goal first = planner.createGoal("First", "d", "Other", today.plusDays(30), null, 0);
-        Goal second = planner.createGoal("Second", "d", "Other", today.plusDays(31), null, 0);
+        Goal first = planner.createGoal("First", "d", GoalCategory.OTHER, today.plusDays(30), null, 0);
+        Goal second = planner.createGoal("Second", "d", GoalCategory.OTHER, today.plusDays(31), null, 0);
         planner.deleteGoal(first.getId());
-        Goal third = planner.createGoal("Third", "d", "Other", today.plusDays(32), null, 0);
+        Goal third = planner.createGoal("Third", "d", GoalCategory.OTHER, today.plusDays(32), null, 0);
 
         assertEquals(second.getId() + 1, third.getId());
     }
 
     @Test
     void separatorsAndLineBreaksInTextSurviveTheFile() {
-        Goal g = planner.createGoal("A | B \\ C", "line one\nline two | end", "Other", today.plusDays(5), null, 0);
+        Goal g = planner.createGoal("A | B \\ C", "line one\nline two | end", GoalCategory.OTHER, today.plusDays(5), null, 0);
         Milestone m = planner.createMilestone(g.getId(), "pipe | milestone", today.plusDays(2), null);
         Task t = planner.createTask(m.getId(), "task\\with\\backslashes", today.plusDays(1), null, null);
         planner.addProgressEntry(t.getId(), "multi\nline | note");
@@ -64,7 +64,7 @@ class FileSystemDalTest extends DalContractTest {
 
     @Test
     void damagedAndUnknownLinesAreSkipped() throws IOException {
-        Goal g = planner.createGoal("Good", "d", "Other", today.plusDays(5), null, 0);
+        Goal g = planner.createGoal("Good", "d", GoalCategory.OTHER, today.plusDays(5), null, 0);
         List<String> lines = new java.util.ArrayList<>(Files.readAllLines(file));
         lines.add("");
         lines.add("G|not-a-number|broken");

@@ -4,6 +4,8 @@ import cs151.application.Main;
 import cs151.model.PersistenceException;
 import cs151.model.ValidationException;
 import cs151.model.Goal;
+import cs151.model.GoalCategory;
+import cs151.model.GoalStatus;
 import cs151.model.GoalPlanner;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -22,7 +24,12 @@ import java.time.LocalDate;
  */
 public class GoalController {
 
-    private final GoalPlanner goalPlanner = new GoalPlanner();
+    private final GoalPlanner goalPlanner;
+
+    /** Receives the one shared {@link GoalPlanner} (dependency injection, see {@code Main}). */
+    public GoalController(GoalPlanner goalPlanner) {
+        this.goalPlanner = goalPlanner;
+    }
 
     @FXML
     private TextField goalNameField;
@@ -31,13 +38,13 @@ public class GoalController {
     private TextArea descriptionArea;
 
     @FXML
-    private ComboBox<String> categoryComboBox;
+    private ComboBox<GoalCategory> categoryComboBox;
 
     @FXML
     private DatePicker targetDatePicker;
 
     @FXML
-    private ComboBox<String> statusComboBox;
+    private ComboBox<GoalStatus> statusComboBox;
 
     @FXML
     private TextField progressField;
@@ -64,15 +71,15 @@ public class GoalController {
     @FXML
     private void initialize() {
         categoryComboBox.setItems(
-                FXCollections.observableArrayList(Goal.CATEGORIES)
+                FXCollections.observableArrayList(GoalCategory.values())
         );
 
         statusComboBox.setItems(
-                FXCollections.observableArrayList(Goal.STATUSES)
+                FXCollections.observableArrayList(GoalStatus.values())
         );
 
         progressField.setText("0");
-        statusComboBox.setValue(Goal.STATUS_NOT_STARTED);
+        statusComboBox.setValue(GoalStatus.NOT_STARTED);
         creationDatePicker.setValue(LocalDate.now());
         creationDatePicker.setDisable(true);
     }
@@ -97,9 +104,9 @@ public class GoalController {
     private void createGoal() {
         String goalName = goalNameField.getText();
         String description = descriptionArea.getText();
-        String category = categoryComboBox.getValue();
+        GoalCategory category = categoryComboBox.getValue();
         LocalDate targetDate = targetDatePicker.getValue();
-        String status = statusComboBox.getValue();
+        GoalStatus status = statusComboBox.getValue();
 
         int progress;
 
@@ -152,7 +159,7 @@ public class GoalController {
         descriptionArea.clear();
         categoryComboBox.setValue(null);
         targetDatePicker.setValue(null);
-        statusComboBox.setValue(Goal.STATUS_NOT_STARTED);
+        statusComboBox.setValue(GoalStatus.NOT_STARTED);
         progressField.setText("0");
         creationDatePicker.setValue(LocalDate.now());
     }

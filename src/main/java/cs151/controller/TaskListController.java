@@ -18,7 +18,12 @@ import java.io.IOException;
 
 public class TaskListController {
 
-    private final GoalPlanner goalPlanner = new GoalPlanner();
+    private final GoalPlanner goalPlanner;
+
+    /** Receives the one shared {@link GoalPlanner} (dependency injection, see {@code Main}). */
+    public TaskListController(GoalPlanner goalPlanner) {
+        this.goalPlanner = goalPlanner;
+    }
 
     private Milestone milestone;
 
@@ -55,11 +60,11 @@ public class TaskListController {
 
         priorityColumn.setCellValueFactory(cell ->
                 new ReadOnlyStringWrapper(
-                        cell.getValue().getPriority()));
+                        cell.getValue().getPriority().label()));
 
         statusColumn.setCellValueFactory(cell ->
                 new ReadOnlyStringWrapper(
-                        cell.getValue().getStatus()));
+                        cell.getValue().getStatus().label()));
 
         tasksTable.setPlaceholder(
                 new Label("This milestone has no tasks yet."));

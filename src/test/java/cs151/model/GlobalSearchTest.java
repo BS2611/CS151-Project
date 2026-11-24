@@ -49,14 +49,14 @@ class GlobalSearchTest extends BackendTestBase {
         Goal later = planner.createGoal(
                 "Shared Later Goal",
                 "description",
-                "Academic",
+                GoalCategory.ACADEMIC,
                 today.plusDays(30)
         );
 
         Goal earlier = planner.createGoal(
                 "Shared Earlier Goal",
                 "description",
-                "Academic",
+                GoalCategory.ACADEMIC,
                 today.plusDays(20)
         );
 
@@ -77,8 +77,8 @@ class GlobalSearchTest extends BackendTestBase {
 
     @Test
     void goalFieldMatchReturnsOnlyThatGoal() {
-        Goal match = planner.createGoal("Alpha Goal", "Learn zebra stripes", "Career", today.plusDays(30));
-        planner.createGoal("Beta Goal", "Something else", "Health", today.plusDays(31));
+        Goal match = planner.createGoal("Alpha Goal", "Learn zebra stripes", GoalCategory.CAREER, today.plusDays(30));
+        planner.createGoal("Beta Goal", "Something else", GoalCategory.HEALTH, today.plusDays(31));
 
         assertEquals(List.of(match.getId()), ids(planner.searchRelatedGoals("zebra")));   // description
         assertEquals(List.of(match.getId()), ids(planner.searchRelatedGoals("career")));  // category
@@ -100,9 +100,9 @@ class GlobalSearchTest extends BackendTestBase {
     void taskFieldsMatchTheirGoal() {
         Goal parent = newGoal("Parent Goal");
         Milestone milestone = newMilestone(parent, "Milestone One");
-        planner.createTask(milestone.getId(), "Write report", today.plusDays(5), "High", "In Progress");
+        planner.createTask(milestone.getId(), "Write report", today.plusDays(5), TaskPriority.HIGH, TaskStatus.IN_PROGRESS);
         Goal other = newGoal("Other Goal");
-        planner.createTask(newMilestone(other, "Milestone Two").getId(), "Read book", today.plusDays(6), "Low", "To Do");
+        planner.createTask(newMilestone(other, "Milestone Two").getId(), "Read book", today.plusDays(6), TaskPriority.LOW, TaskStatus.TO_DO);
 
         assertEquals(List.of(parent.getId()), ids(planner.searchRelatedGoals("high")));         // priority
         assertEquals(List.of(parent.getId()), ids(planner.searchRelatedGoals("in progress")));  // status
@@ -111,7 +111,7 @@ class GlobalSearchTest extends BackendTestBase {
 
     @Test
     void datesAreSearchable() {
-        Goal goal = planner.createGoal("Dated Goal", "desc", "Academic", today.plusDays(300));
+        Goal goal = planner.createGoal("Dated Goal", "desc", GoalCategory.ACADEMIC, today.plusDays(300));
         Milestone milestone = planner.createMilestone(goal.getId(), "Dated Milestone", today.plusDays(200), null);
         planner.createTask(milestone.getId(), "Dated Task", today.plusDays(100), null, null);
         Goal other = newGoal("Other Goal");
@@ -126,8 +126,8 @@ class GlobalSearchTest extends BackendTestBase {
 
     @Test
     void goalProgressIsSearchableAsText() {
-        Goal half = planner.createGoal("Half Done", "desc", "Academic", today.plusDays(30), "In Progress", 73);
-        planner.createGoal("Just Started", "desc", "Academic", today.plusDays(31), "Not Started", 0);
+        Goal half = planner.createGoal("Half Done", "desc", GoalCategory.ACADEMIC, today.plusDays(30), GoalStatus.IN_PROGRESS, 73);
+        planner.createGoal("Just Started", "desc", GoalCategory.ACADEMIC, today.plusDays(31), GoalStatus.NOT_STARTED, 0);
 
         assertEquals(List.of(half.getId()), ids(planner.searchRelatedGoals("73")));
     }

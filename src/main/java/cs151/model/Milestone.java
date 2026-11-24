@@ -1,52 +1,71 @@
 package cs151.model;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Objects;
 
-/** A milestone that belongs to exactly one Goal. */
+/**
+ * A milestone that belongs to exactly one Goal.
+ *
+ * <p>Class invariants: the name is not empty; target date and status are not null. An operation that would break
+ * an invariant throws a {@link ValidationException} and leaves the milestone unchanged.
+ */
 public class Milestone {
-    public static final List<String> STATUSES = List.of("Not Started", "In Progress", "Completed", "Skipped");
-    public static final String STATUS_NOT_STARTED = "Not Started";
-    public static final String STATUS_COMPLETED = "Completed";
-    public static final String STATUS_SKIPPED = "Skipped";
-
     private long id;
     private final long goalId;
     private String milestoneName;
     private LocalDate targetDate;
-    private String status;
+    private MilestoneStatus status;
 
-    public Milestone(long goalId, String milestoneName, LocalDate targetDate, String status) {
+    /**
+     * @precondition the values satisfy the class invariants
+     * @throws ValidationException if a class invariant would be broken
+     */
+    public Milestone(long goalId, String milestoneName, LocalDate targetDate, MilestoneStatus status) {
         this(0, goalId, milestoneName, targetDate, status);
     }
 
-    /** Full constructor used when loading a stored milestone. */
-    public Milestone(long id, long goalId, String milestoneName, LocalDate targetDate, String status) {
+    /**
+     * Full constructor used when loading a stored milestone.
+     *
+     * @precondition the values satisfy the class invariants
+     * @throws ValidationException if a class invariant would be broken
+     */
+    public Milestone(long id, long goalId, String milestoneName, LocalDate targetDate, MilestoneStatus status) {
         this.id = id;
         this.goalId = goalId;
-        setMilestoneName(milestoneName);
-        this.targetDate = targetDate;
-        this.status = status;
+        apply(milestoneName, targetDate, status);
     }
 
     public long getId() { return id; }
     public void setId(long id) { this.id = id; }
 
     public long getGoalId() { return goalId; }
-
     public String getMilestoneName() { return milestoneName; }
-    public void setMilestoneName(String milestoneName) {
-        this.milestoneName = milestoneName == null ? "" : milestoneName.trim();
+    public LocalDate getTargetDate() { return targetDate; }
+    public MilestoneStatus getStatus() { return status; }
+
+    /**
+     * Changes everything the user can edit in one step; the goal of a milestone never changes.
+     *
+     * @precondition the new values satisfy the class invariants
+     * @throws ValidationException if a class invariant would be broken; the milestone is then unchanged
+     */
+    public void update(String milestoneName, LocalDate targetDate, MilestoneStatus status) {
+        apply(milestoneName, targetDate, status);
     }
 
-    public LocalDate getTargetDate() { return targetDate; }
-    public void setTargetDate(LocalDate targetDate) { this.targetDate = targetDate; }
+    /** @postcondition status is Completed */
+    public void markCompleted() { this.status = MilestoneStatus.COMPLETED; }
 
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
-
-    public void markCompleted() { this.status = STATUS_COMPLETED; }
+    private void apply(String name, LocalDate targetDate, MilestoneStatus status) {
+        String cleanName = name == null ? "" : name.trim();
+        if (cleanName.isEmpty()) throw new ValidationException("Milestone name is required.");
+        if (targetDate == null) throw new ValidationException("Milestone target date is required.");
+        if (status == null) throw new ValidationException("Milestone status is required.");
+        this.milestoneName = cleanName;
+        this.targetDate = targetDate;
+        this.status = status;
+    }
 
     @Override
     public boolean equals(Object o) {

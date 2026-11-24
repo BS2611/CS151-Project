@@ -3,6 +3,8 @@ package cs151.view;
 import cs151.application.Main;
 import cs151.model.GoalDeletionImpact;
 import cs151.model.Goal;
+import cs151.model.GoalStatus;
+import cs151.model.MilestoneStatus;
 import cs151.model.Milestone;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -34,8 +36,8 @@ public final class GoalDialogs {
         name.setWrapText(true);
 
         HBox pills = new HBox(8,
-                Pills.pill(goal.getCategory(), Pills.categoryStyle(goal.getCategory())),
-                Pills.statusPill(goal.getStatus()));
+                Pills.pill(goal.getCategory().label(), Pills.categoryStyle(goal.getCategory().label())),
+                Pills.statusPill(goal.getStatus().label()));
         pills.setAlignment(Pos.CENTER_LEFT);
 
         VBox titleBox = new VBox(8, pills, name);
@@ -51,7 +53,7 @@ public final class GoalDialogs {
 
         // target date, created, progress
         long days = ChronoUnit.DAYS.between(LocalDate.now(), goal.getTargetDate());
-        String remaining = "Completed".equals(goal.getStatus()) ? "Completed"
+        String remaining = goal.getStatus() == GoalStatus.COMPLETED ? "Completed"
                 : days >= 0 ? days + " days remaining" : Math.abs(days) + " days overdue";
         VBox target = infoBlock("TARGET DATE", goal.getTargetDate().toString(), remaining);
         VBox created = infoBlock("CREATED", goal.getCreationDate() == null ? "" : goal.getCreationDate().toString(), "");
@@ -73,7 +75,7 @@ public final class GoalDialogs {
         facts.getStyleClass().add("dialog-facts");
 
         // milestones
-        long doneCount = milestones.stream().filter(m -> Milestone.STATUS_COMPLETED.equals(m.getStatus())).count();
+        long doneCount = milestones.stream().filter(m -> m.getStatus() == MilestoneStatus.COMPLETED).count();
         Label milestoneTitle = new Label("Milestones  (" + doneCount + " / " + milestones.size() + " done)");
         milestoneTitle.getStyleClass().add("section-title");
 
@@ -84,7 +86,7 @@ public final class GoalDialogs {
             list.getChildren().add(none);
         }
         for (Milestone milestone : milestones) {
-            boolean complete = Milestone.STATUS_COMPLETED.equals(milestone.getStatus());
+            boolean complete = milestone.getStatus() == MilestoneStatus.COMPLETED;
             FontIcon icon = new FontIcon(complete ? "fas-check-circle" : "far-circle");
             icon.getStyleClass().add(complete ? "stored-icon" : "date-icon");
             Label milestoneName = new Label(milestone.getMilestoneName());
@@ -93,7 +95,7 @@ public final class GoalDialogs {
             date.getStyleClass().add("cell-sub");
             Region spacer = new Region();
             HBox.setHgrow(spacer, Priority.ALWAYS);
-            HBox row = new HBox(10, icon, milestoneName, spacer, date, Pills.statusPill(milestone.getStatus()));
+            HBox row = new HBox(10, icon, milestoneName, spacer, date, Pills.statusPill(milestone.getStatus().label()));
             row.setAlignment(Pos.CENTER_LEFT);
             row.getStyleClass().add("dialog-row");
             list.getChildren().add(row);

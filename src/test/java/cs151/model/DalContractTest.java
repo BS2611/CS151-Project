@@ -37,7 +37,7 @@ abstract class DalContractTest {
     }
 
     private Goal goal(String name) {
-        return new Goal(name, "desc", "Academic", today.plusDays(30), "Not Started", 0);
+        return new Goal(name, "desc", GoalCategory.ACADEMIC, today.plusDays(30), GoalStatus.NOT_STARTED, 0);
     }
 
     private Goal savedGoal(String name) {
@@ -47,13 +47,13 @@ abstract class DalContractTest {
     }
 
     private Milestone savedMilestone(Goal g, String name, int days) {
-        Milestone m = new Milestone(g.getId(), name, today.plusDays(days), "Not Started");
+        Milestone m = new Milestone(g.getId(), name, today.plusDays(days), MilestoneStatus.NOT_STARTED);
         dal.insertMilestone(m);
         return m;
     }
 
     private Task savedTask(Milestone m, String description, int days) {
-        Task t = new Task(m.getId(), description, today.plusDays(days), "Medium", "To Do");
+        Task t = new Task(m.getId(), description, today.plusDays(days), TaskPriority.MEDIUM, TaskStatus.TO_DO);
         dal.insertTask(t);
         return t;
     }
@@ -90,9 +90,9 @@ abstract class DalContractTest {
 
     @Test
     void listsAreSortedByDateThenName() {
-        Goal late = new Goal("B late", "", "Other", today.plusDays(50), "Not Started", 0);
-        Goal soonB = new Goal("B soon", "", "Other", today.plusDays(10), "Not Started", 0);
-        Goal soonA = new Goal("A soon", "", "Other", today.plusDays(10), "Not Started", 0);
+        Goal late = new Goal("B late", "", GoalCategory.OTHER, today.plusDays(50), GoalStatus.NOT_STARTED, 0);
+        Goal soonB = new Goal("B soon", "", GoalCategory.OTHER, today.plusDays(10), GoalStatus.NOT_STARTED, 0);
+        Goal soonA = new Goal("A soon", "", GoalCategory.OTHER, today.plusDays(10), GoalStatus.NOT_STARTED, 0);
         dal.insertGoal(late);
         dal.insertGoal(soonB);
         dal.insertGoal(soonA);
@@ -110,27 +110,24 @@ abstract class DalContractTest {
     @Test
     void updateChangesTheStoredRecordAndReportsMissingOnes() {
         Goal g = savedGoal("Old");
-        g.setName("New");
-        g.setProgress(40);
-        g.setStatus("In Progress");
+        g.update("New", g.getDescription(), g.getCategory(), g.getTargetDate(), GoalStatus.IN_PROGRESS, 40);
         assertTrue(dal.updateGoal(g));
         Goal loaded = dal.findGoalById(g.getId()).orElseThrow();
         assertEquals("New", loaded.getName());
         assertEquals(40, loaded.getProgress());
 
         Milestone m = savedMilestone(g, "M", 5);
-        m.setMilestoneName("M2");
-        m.setStatus("Completed");
+        m.update("M2", m.getTargetDate(), MilestoneStatus.COMPLETED);
         assertTrue(dal.updateMilestone(m));
         assertEquals("M2", dal.findMilestoneById(m.getId()).orElseThrow().getMilestoneName());
 
         Task t = savedTask(m, "T", 2);
-        t.setDescription("T2");
+        t.update("T2", t.getDueDate(), t.getPriority(), t.getStatus());
         t.markCompleted();
         assertTrue(dal.updateTask(t));
         Task savedTask = dal.findTaskById(t.getId()).orElseThrow();
         assertEquals("T2", savedTask.getDescription());
-        assertEquals("Completed", savedTask.getStatus());
+        assertEquals(TaskStatus.COMPLETED, savedTask.getStatus());
         assertEquals(today, savedTask.getCompletionDate());
 
         ProgressEntry e = new ProgressEntry(t.getId(), "first");
@@ -139,7 +136,7 @@ abstract class DalContractTest {
         assertTrue(dal.updateProgressEntry(e));
         assertEquals("second", dal.findProgressEntryById(e.getId()).orElseThrow().getNote());
 
-        assertFalse(dal.updateGoal(new Goal(999, "x", "", "Other", today, "Not Started", 0, today)));
+        assertFalse(dal.updateGoal(new Goal(999, "x", "", GoalCategory.OTHER, today, GoalStatus.NOT_STARTED, 0, today)));
         assertFalse(dal.deleteGoal(999));
         assertFalse(dal.deleteMilestone(999));
         assertFalse(dal.deleteTask(999));
@@ -165,9 +162,9 @@ abstract class DalContractTest {
     @Test
     void childrenNeedAnExistingParent() {
         assertThrows(NotFoundException.class,
-                () -> dal.insertMilestone(new Milestone(99, "M", today, "Not Started")));
+                () -> dal.insertMilestone(new Milestone(99, "M", today, MilestoneStatus.NOT_STARTED)));
         assertThrows(NotFoundException.class,
-                () -> dal.insertTask(new Task(99, "T", today, "Medium", "To Do")));
+                () -> dal.insertTask(new Task(99, "T", today, TaskPriority.MEDIUM, TaskStatus.TO_DO)));
         assertThrows(NotFoundException.class, () -> dal.insertProgressEntry(new ProgressEntry(99, "n")));
     }
 
@@ -201,7 +198,7 @@ abstract class DalContractTest {
 
     @Test
     void searchIsCaseInsensitiveAndCoversTheDocumentedColumns() {
-        Goal g = new Goal("Learn Java", "weekly practice", "Career", today.plusDays(30), "In Progress", 45);
+        Goal g = new Goal("Learn Java", "weekly practice", GoalCategory.CAREER, today.plusDays(30), GoalStatus.IN_PROGRESS, 45);
         dal.insertGoal(g);
         Milestone m = savedMilestone(g, "Finish Streams chapter", 10);
         savedTask(m, "Read the LAMBDA notes", 5);
@@ -223,13 +220,13 @@ abstract class DalContractTest {
 
     @Test
     void goalPlannerAppliesTheSameBusinessRulesOnAnyStorage() {
-        Goal g = planner.createGoal("Plan", "d", "Health", today.plusDays(30), null, 0);
+        Goal g = planner.createGoal("Plan", "d", GoalCategory.HEALTH, today.plusDays(30), null, 0);
         Milestone m = planner.createMilestone(g.getId(), "M", today.plusDays(10), null);
         Task t = planner.createTask(m.getId(), "T", today.plusDays(5), null, null);
         planner.addProgressEntry(t.getId(), "started");
 
         assertThrows(DuplicateEntityException.class,
-                () -> planner.createGoal("Plan", "d", "Health", today.plusDays(30), null, 0));
+                () -> planner.createGoal("Plan", "d", GoalCategory.HEALTH, today.plusDays(30), null, 0));
         assertThrows(ValidationException.class,
                 () -> planner.createMilestone(g.getId(), "Late", today.plusDays(60), null));
         assertThrows(ValidationException.class,
@@ -254,9 +251,9 @@ abstract class DalContractTest {
 
     @Test
     void reportGeneratorWorksOnAnyStorage() {
-        Goal done = planner.createGoal("Done", "d", "Career", today.plusDays(30), null, 0);
+        Goal done = planner.createGoal("Done", "d", GoalCategory.CAREER, today.plusDays(30), null, 0);
         planner.markGoalCompleted(done.getId());
-        Goal open = planner.createGoal("Open", "d", "Career", today.plusDays(40), "In Progress", 50);
+        Goal open = planner.createGoal("Open", "d", GoalCategory.CAREER, today.plusDays(40), GoalStatus.IN_PROGRESS, 50);
         Milestone m = planner.createMilestone(open.getId(), "M", today.plusDays(10), null);
         planner.createTask(m.getId(), "T1", today.plusDays(2), null, null);
         planner.createTask(m.getId(), "T2", today.plusDays(3), null, null);
@@ -274,7 +271,7 @@ abstract class DalContractTest {
         assertEquals(1, detail.milestones().size());
         assertEquals(2, detail.milestones().get(0).tasks().size());
         assertEquals(75.0, reports.categorySummary().stream()
-                .filter(r -> r.category().equals("Career")).findFirst().orElseThrow().averageProgress(), 0.001);
+                .filter(r -> r.category().equals(GoalCategory.CAREER.label())).findFirst().orElseThrow().averageProgress(), 0.001);
         assertTrue(reports.overdueItems().goals().isEmpty());
     }
 }

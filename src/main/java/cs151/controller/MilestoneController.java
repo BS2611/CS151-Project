@@ -5,6 +5,7 @@ import cs151.model.PersistenceException;
 import cs151.model.ValidationException;
 import cs151.model.Goal;
 import cs151.model.Milestone;
+import cs151.model.MilestoneStatus;
 import cs151.model.GoalPlanner;
 import cs151.view.Pills;
 import javafx.collections.FXCollections;
@@ -24,7 +25,12 @@ import java.io.IOException;
  */
 public class MilestoneController {
 
-    private final GoalPlanner goalPlanner = new GoalPlanner();
+    private final GoalPlanner goalPlanner;
+
+    /** Receives the one shared {@link GoalPlanner} (dependency injection, see {@code Main}). */
+    public MilestoneController(GoalPlanner goalPlanner) {
+        this.goalPlanner = goalPlanner;
+    }
     private Milestone editingMilestone;
 
     @FXML
@@ -37,7 +43,7 @@ public class MilestoneController {
     private DatePicker targetDatePicker;
 
     @FXML
-    private ComboBox<String> statusComboBox;
+    private ComboBox<MilestoneStatus> statusComboBox;
 
     @FXML
     private Label pageTitleLabel;
@@ -86,9 +92,9 @@ public class MilestoneController {
         );
 
         statusComboBox.setItems(
-                FXCollections.observableArrayList(Milestone.STATUSES)
+                FXCollections.observableArrayList(MilestoneStatus.values())
         );
-        statusComboBox.setValue(Milestone.STATUS_NOT_STARTED);
+        statusComboBox.setValue(MilestoneStatus.NOT_STARTED);
     }
 
     /** Called by Main right after the page is loaded: pre-selects the goal the user picked in the goal list. */
@@ -108,9 +114,9 @@ public class MilestoneController {
     private void showGoalSummary(Goal goal) {
         boolean has = goal != null;
         summaryName.setText(has ? goal.getName() : "No goal selected");
-        summaryCategory.setText(has ? goal.getCategory().toUpperCase() : "GOAL");
+        summaryCategory.setText(has ? goal.getCategory().label().toUpperCase() : "GOAL");
         summaryCategory.getStyleClass().removeIf(c -> c.startsWith("pill-cat-") || c.equals("pill-neutral"));
-        summaryCategory.getStyleClass().add(has ? Pills.categoryStyle(goal.getCategory()) : "pill-neutral");
+        summaryCategory.getStyleClass().add(has ? Pills.categoryStyle(goal.getCategory().label()) : "pill-neutral");
         summaryDeadline.setText(has ? "Target deadline: " + goal.getTargetDate() : "");
         summaryPercent.setText(has ? goal.getProgress() + "% completed" : "");
         summaryProgress.setProgress(has ? goal.getProgress() / 100.0 : 0);
@@ -170,7 +176,7 @@ public class MilestoneController {
     private void clearForm() {
         milestoneNameField.clear();
         targetDatePicker.setValue(null);
-        statusComboBox.setValue(Milestone.STATUS_NOT_STARTED);
+        statusComboBox.setValue(MilestoneStatus.NOT_STARTED);
     }
 
     @FXML

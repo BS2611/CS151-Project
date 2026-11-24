@@ -13,10 +13,6 @@ import java.util.Map;
 public class ReportGenerator {
     private final DAL dal;
 
-    public ReportGenerator() {
-        this(new SqliteDAL());
-    }
-
     /** Reads the data through the given {@link DAL}, so the reports work with any storage. */
     public ReportGenerator(DAL dal) {
         this.dal = dal;
@@ -29,7 +25,8 @@ public class ReportGenerator {
             List<Milestone> milestones = dal.getMilestonesForGoal(g.getId());
             int tasks = 0;
             for (Milestone m : milestones) tasks += dal.getTasksForMilestone(m.getId()).size();
-            rows.add(new GoalOverviewRow(g.getId(), g.getName(), g.getCategory(), g.getStatus(), g.getProgress(),
+            rows.add(new GoalOverviewRow(g.getId(), g.getName(), g.getCategory().label(), g.getStatus().label(),
+                    g.getProgress(),
                     g.getTargetDate(), milestones.size(), tasks));
         }
         return rows;
@@ -45,8 +42,8 @@ public class ReportGenerator {
     /** Report 3: number of goals per status (all five statuses are present, in order, even when 0). */
     public Map<String, Integer> statusSummary() {
         Map<String, Integer> counts = new LinkedHashMap<>();
-        for (String status : Goal.STATUSES) counts.put(status, 0);
-        for (Goal g : dal.getAllGoals()) counts.merge(g.getStatus(), 1, Integer::sum);
+        for (GoalStatus status : GoalStatus.values()) counts.put(status.label(), 0);
+        for (Goal g : dal.getAllGoals()) counts.merge(g.getStatus().label(), 1, Integer::sum);
         return counts;
     }
 
@@ -54,16 +51,16 @@ public class ReportGenerator {
     public List<CategorySummaryRow> categorySummary() {
         List<Goal> goals = dal.getAllGoals();
         List<CategorySummaryRow> rows = new ArrayList<>();
-        for (String category : Goal.CATEGORIES) {
+        for (GoalCategory category : GoalCategory.values()) {
             int count = 0;
             int total = 0;
             for (Goal g : goals) {
-                if (category.equals(g.getCategory())) {
+                if (category == g.getCategory()) {
                     count++;
                     total += g.getProgress();
                 }
             }
-            rows.add(new CategorySummaryRow(category, count, count == 0 ? 0.0 : (double) total / count));
+            rows.add(new CategorySummaryRow(category.label(), count, count == 0 ? 0.0 : (double) total / count));
         }
         return rows;
     }
@@ -85,18 +82,18 @@ public class ReportGenerator {
         List<Milestone> milestones = new ArrayList<>();
         List<Task> tasks = new ArrayList<>();
         for (Goal g : dal.getAllGoals()) {
-            if (g.getTargetDate().isBefore(today) && !Goal.STATUS_COMPLETED.equals(g.getStatus())
-                    && !Goal.STATUS_ABANDONED.equals(g.getStatus())) {
+            if (g.getTargetDate().isBefore(today) && g.getStatus() != GoalStatus.COMPLETED
+                    && g.getStatus() != GoalStatus.ABANDONED) {
                 goals.add(g);
             }
             for (Milestone m : dal.getMilestonesForGoal(g.getId())) {
-                if (m.getTargetDate().isBefore(today) && !Milestone.STATUS_COMPLETED.equals(m.getStatus())
-                        && !Milestone.STATUS_SKIPPED.equals(m.getStatus())) {
+                if (m.getTargetDate().isBefore(today) && m.getStatus() != MilestoneStatus.COMPLETED
+                        && m.getStatus() != MilestoneStatus.SKIPPED) {
                     milestones.add(m);
                 }
                 for (Task t : dal.getTasksForMilestone(m.getId())) {
-                    if (t.getDueDate().isBefore(today) && !Task.STATUS_COMPLETED.equals(t.getStatus())
-                            && !Task.STATUS_CANCELLED.equals(t.getStatus())) {
+                    if (t.getDueDate().isBefore(today) && t.getStatus() != TaskStatus.COMPLETED
+                            && t.getStatus() != TaskStatus.CANCELLED) {
                         tasks.add(t);
                     }
                 }
@@ -112,8 +109,8 @@ public class ReportGenerator {
         int active = 0;
         int tasks = 0;
         for (Goal g : goals) {
-            if (Goal.STATUS_COMPLETED.equals(g.getStatus())) completed++;
-            else if (!Goal.STATUS_ABANDONED.equals(g.getStatus())) active++;
+            if (g.getStatus() == GoalStatus.COMPLETED) completed++;
+            else if (g.getStatus() != GoalStatus.ABANDONED) active++;
             for (Milestone m : dal.getMilestonesForGoal(g.getId())) {
                 tasks += dal.getTasksForMilestone(m.getId()).size();
             }

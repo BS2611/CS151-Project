@@ -3,6 +3,7 @@ package cs151.application;
 import cs151.model.Goal;
 import cs151.model.GoalPlanner;
 import cs151.model.SeedData;
+import cs151.model.SqliteDAL;
 import cs151.model.Milestone;
 import cs151.model.Task;
 import cs151.controller.ProgressController;
@@ -35,6 +36,12 @@ import java.io.IOException;
  */
 public class Main extends Application {
 
+    /**
+     * The one {@link GoalPlanner} of the application. It is created here (the composition root) with the storage
+     * strategy that is used and handed to every controller that needs it (dependency injection).
+     */
+    private static GoalPlanner goalPlanner;
+
     private static Scene scene;
     private static Stage stage;
     private static WindowChrome chrome;
@@ -64,7 +71,8 @@ public class Main extends Application {
         loadFonts();
 
         // v0.6: make sure the sample goals and milestones exist on first launch
-        SeedData.seedIfEmpty(new GoalPlanner());
+        goalPlanner = new GoalPlanner(new SqliteDAL());
+        SeedData.seedIfEmpty(goalPlanner);
 
         stage = primaryStage;
         // Windows/Linux: frameless window with our own buttons. macOS: the normal macOS window frame (UNIFIED:
@@ -365,9 +373,27 @@ public static void showMilestonePage(Goal goal) throws IOException {
     }
 
     private static FXMLLoader createLoader(String fileName) {
-        return new FXMLLoader(
+        FXMLLoader loader = new FXMLLoader(
                 Main.class.getResource("/cs151/view/" + fileName)
         );
+        loader.setControllerFactory(Main::createController);
+        return loader;
+    }
+
+    /**
+     * Creates a controller for the FXML loader. A controller that has a constructor taking a {@link GoalPlanner}
+     * receives the shared one; the others (for example the sidebar) are created with their default constructor.
+     */
+    private static Object createController(Class<?> type) {
+        try {
+            try {
+                return type.getConstructor(GoalPlanner.class).newInstance(goalPlanner);
+            } catch (NoSuchMethodException noModelNeeded) {
+                return type.getDeclaredConstructor().newInstance();
+            }
+        } catch (ReflectiveOperationException e) {
+            throw new IllegalStateException("Cannot create controller " + type.getName(), e);
+        }
     }
 
     private static Parent loadView(String fileName) throws IOException {

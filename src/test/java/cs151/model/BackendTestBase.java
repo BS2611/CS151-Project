@@ -27,7 +27,7 @@ public abstract class BackendTestBase {
     }
 
     protected Goal newGoal(String name) {
-        return planner.createGoal(name, "desc", "Academic", today.plusDays(30), "Not Started", 0);
+        return planner.createGoal(name, "desc", GoalCategory.ACADEMIC, today.plusDays(30), GoalStatus.NOT_STARTED, 0);
     }
 
     protected Milestone newMilestone(Goal goal, String name) {

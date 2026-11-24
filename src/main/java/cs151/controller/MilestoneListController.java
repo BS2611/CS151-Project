@@ -25,7 +25,12 @@ import java.time.LocalDate;
  */
 public class MilestoneListController {
 
-    private final GoalPlanner goalPlanner = new GoalPlanner();
+    private final GoalPlanner goalPlanner;
+
+    /** Receives the one shared {@link GoalPlanner} (dependency injection, see {@code Main}). */
+    public MilestoneListController(GoalPlanner goalPlanner) {
+        this.goalPlanner = goalPlanner;
+    }
 
     private Goal goal;
 
@@ -61,7 +66,7 @@ public class MilestoneListController {
         );
 
         statusColumn.setCellValueFactory(
-                cell -> new ReadOnlyStringWrapper(cell.getValue().getStatus())
+                cell -> new ReadOnlyStringWrapper(cell.getValue().getStatus().label())
         );
 
         statusColumn.setCellFactory(column -> new TableCell<>() {

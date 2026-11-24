@@ -2,6 +2,9 @@ package cs151.controller;
 
 import cs151.application.Main;
 import cs151.model.Goal;
+import cs151.model.GoalCategory;
+import cs151.model.GoalStatus;
+import cs151.model.MilestoneStatus;
 import cs151.model.Milestone;
 import cs151.model.GoalPlanner;
 import cs151.view.GoalDialogs;
@@ -121,7 +124,12 @@ public class GoalListController {
 
     private static final String HINT = "Select a goal, then add or view its milestones. Double-click a row to open its milestones.";
 
-    private final GoalPlanner goalPlanner = new GoalPlanner();
+    private final GoalPlanner goalPlanner;
+
+    /** Receives the one shared {@link GoalPlanner} (dependency injection, see {@code Main}). */
+    public GoalListController(GoalPlanner goalPlanner) {
+        this.goalPlanner = goalPlanner;
+    }
     private javafx.animation.PauseTransition hintReset;
 
     // Presentation state: the filters and the page only decide which goals the table shows.
@@ -141,7 +149,7 @@ public class GoalListController {
         );
 
         categoryColumn.setCellValueFactory(
-                cell -> new ReadOnlyStringWrapper(cell.getValue().getCategory())
+                cell -> new ReadOnlyStringWrapper(cell.getValue().getCategory().label())
         );
 
         targetDateColumn.setCellValueFactory(
@@ -149,7 +157,7 @@ public class GoalListController {
         );
 
         statusColumn.setCellValueFactory(
-                cell -> new ReadOnlyStringWrapper(cell.getValue().getStatus())
+                cell -> new ReadOnlyStringWrapper(cell.getValue().getStatus().label())
         );
 
         progressColumn.setCellValueFactory(
@@ -160,7 +168,7 @@ public class GoalListController {
 
         milestonesColumn.setCellValueFactory(cell -> {
             List<Milestone> milestones = goalPlanner.getMilestonesForGoal(cell.getValue().getId());
-            long done = milestones.stream().filter(m -> Milestone.STATUS_COMPLETED.equals(m.getStatus())).count();
+            long done = milestones.stream().filter(m -> m.getStatus() == MilestoneStatus.COMPLETED).count();
             return new ReadOnlyStringWrapper(done + "/" + milestones.size());
         });
 
@@ -284,14 +292,14 @@ public class GoalListController {
                     return;
                 }
                 long days = ChronoUnit.DAYS.between(LocalDate.now(), goal.getTargetDate());
-                boolean soon = days <= 14 && !"Completed".equals(goal.getStatus());
+                boolean soon = days <= 14 && goal.getStatus() != GoalStatus.COMPLETED;
                 FontIcon calendar = new FontIcon(soon ? "far-clock" : "far-calendar-alt");
                 calendar.getStyleClass().add(soon ? "date-icon-warn" : "date-icon");
                 Label dateLabel = new Label(date);
                 dateLabel.getStyleClass().add(soon ? "cell-title-warn" : "cell-title");
                 HBox top = new HBox(8, calendar, dateLabel);
                 top.setAlignment(Pos.CENTER_LEFT);
-                String text = "Completed".equals(goal.getStatus()) ? "Completed"
+                String text = goal.getStatus() == GoalStatus.COMPLETED ? "Completed"
                         : days >= 0 ? days + " days remaining" : Math.abs(days) + " days overdue";
                 Label sub = new Label(text);
                 sub.getStyleClass().add(soon ? "cell-sub-warn" : "cell-sub");
@@ -362,8 +370,12 @@ public class GoalListController {
 
     /** Fills the search box, drop-downs and category chips and re-applies the filters whenever one changes. */
     private void setUpFilters() {
-        statusFilter.setItems(FXCollections.observableArrayList(
-                ALL_STATUSES, "Not Started", "In Progress", "On Hold", "Completed", "Abandoned"));
+        List<String> statusChoices = new java.util.ArrayList<>();
+        statusChoices.add(ALL_STATUSES);
+        for (GoalStatus goalStatus : GoalStatus.values()) {
+            statusChoices.add(goalStatus.label());
+        }
+        statusFilter.setItems(FXCollections.observableArrayList(statusChoices));
         statusFilter.setValue(ALL_STATUSES);
 
         sortCombo.setItems(FXCollections.observableArrayList(SORT_LATEST, SORT_SOONEST, SORT_NAME, SORT_PROGRESS));
@@ -373,7 +385,12 @@ public class GoalListController {
         rowsPerPageCombo.setValue(10);
 
         ToggleGroup group = new ToggleGroup();
-        for (String category : new String[]{ALL_CATEGORIES, "Academic", "Career", "Health", "Financial", "Personal", "Other"}) {
+        List<String> categoryChoices = new java.util.ArrayList<>();
+        categoryChoices.add(ALL_CATEGORIES);
+        for (GoalCategory goalCategory : GoalCategory.values()) {
+            categoryChoices.add(goalCategory.label());
+        }
+        for (String category : categoryChoices) {
             ToggleButton chip = new ToggleButton(category);
             chip.getStyleClass().add("chip");
             chip.setToggleGroup(group);
@@ -447,9 +464,9 @@ public class GoalListController {
                 .filter(goal -> query.isEmpty()
                         || goal.getName().toLowerCase().contains(query)
                         || (goal.getDescription() != null && goal.getDescription().toLowerCase().contains(query))
-                        || goal.getCategory().toLowerCase().contains(query))
-                .filter(goal -> ALL_STATUSES.equals(status) || goal.getStatus().equals(status))
-                .filter(goal -> ALL_CATEGORIES.equals(selectedCategory) || goal.getCategory().equals(selectedCategory))
+                        || goal.getCategory().label().toLowerCase().contains(query))
+                .filter(goal -> ALL_STATUSES.equals(status) || goal.getStatus().label().equals(status))
+                .filter(goal -> ALL_CATEGORIES.equals(selectedCategory) || goal.getCategory().label().equals(selectedCategory))
                 .sorted(order)
                 .toList();
 
@@ -503,7 +520,7 @@ public class GoalListController {
     private void showSummary() {
         summaryBox.getChildren().clear();
         for (String status : new String[]{"In Progress", "Not Started", "Completed"}) {
-            long count = allGoals.stream().filter(g -> status.equals(g.getStatus())).count();
+            long count = allGoals.stream().filter(g -> status.equals(g.getStatus().label())).count();
             Label dot = new Label();
             dot.getStyleClass().addAll("dot", "dot-" + Pills.statusStyle(status).substring(5));
             Label number = new Label(String.valueOf(count));

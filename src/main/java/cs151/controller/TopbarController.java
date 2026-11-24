@@ -51,7 +51,12 @@ public class TopbarController {
         void go() throws IOException;
     }
 
-    private final GoalPlanner goalPlanner = new GoalPlanner();
+    private final GoalPlanner goalPlanner;
+
+    /** Receives the one shared {@link GoalPlanner} (dependency injection, see {@code Main}). */
+    public TopbarController(GoalPlanner goalPlanner) {
+        this.goalPlanner = goalPlanner;
+    }
     private final ListView<Suggestion> suggestionList = new ListView<>();
     private final Popup popup = new Popup();
     private Debounce suggestPause;
@@ -197,7 +202,7 @@ public class TopbarController {
         SearchResults results = goalPlanner.search(text);
         List<Suggestion> items = new ArrayList<>();
         for (Goal goal : results.goals().stream().limit(PER_KIND).toList()) {
-            items.add(new Suggestion("Goal", goal.getName(), goal.getCategory(),
+            items.add(new Suggestion("Goal", goal.getName(), goal.getCategory().label(),
                     () -> open(() -> Main.showMilestoneListPage(goal))));
         }
         for (Milestone milestone : results.milestones().stream().limit(PER_KIND).toList()) {

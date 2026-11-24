@@ -23,7 +23,7 @@ public final class SeedData {
         Goal dsa = planner.createGoal(
                 "Master Data Structures and Algorithms",
                 "Get comfortable with core data structures and interview-style problems.",
-                "Academic",
+                GoalCategory.ACADEMIC,
                 today.plusDays(90)
         );
 
@@ -38,7 +38,7 @@ public final class SeedData {
                 arrays.getId(),
                 "Review array operations and time complexity",
                 today.plusDays(7),
-                "Medium",
+                TaskPriority.MEDIUM,
                 null
         );
         progress(planner, arraysTask1, today.minusDays(6),
@@ -50,7 +50,7 @@ public final class SeedData {
                 arrays.getId(),
                 "Complete linked-list coding exercises",
                 today.plusDays(14),
-                "High",
+                TaskPriority.HIGH,
                 null
         );
         progress(planner, arraysTask2, today.minusDays(5),
@@ -69,7 +69,7 @@ public final class SeedData {
                 trees.getId(),
                 "Implement binary-tree traversals",
                 today.plusDays(30),
-                "Medium",
+                TaskPriority.MEDIUM,
                 null
         );
         progress(planner, treesTask1, today.minusDays(6),
@@ -81,7 +81,7 @@ public final class SeedData {
                 trees.getId(),
                 "Practice graph-search problems using BFS and DFS",
                 today.plusDays(42),
-                "High",
+                TaskPriority.HIGH,
                 null
         );
         progress(planner, treesTask2, today.minusDays(5),
@@ -100,7 +100,7 @@ public final class SeedData {
                 practice.getId(),
                 "Complete the first 25 practice problems",
                 today.plusDays(60),
-                "Medium",
+                TaskPriority.MEDIUM,
                 null
         );
         progress(planner, practiceTask1, today.minusDays(6),
@@ -112,7 +112,7 @@ public final class SeedData {
                 practice.getId(),
                 "Complete the remaining 25 practice problems",
                 today.plusDays(75),
-                "High",
+                TaskPriority.HIGH,
                 null
         );
         progress(planner, practiceTask2, today.minusDays(4),
@@ -124,7 +124,7 @@ public final class SeedData {
         Goal internship = planner.createGoal(
                 "Land a Summer Internship",
                 "Apply to software engineering internships for next summer.",
-                "Career",
+                GoalCategory.CAREER,
                 today.plusDays(150)
         );
 
@@ -139,7 +139,7 @@ public final class SeedData {
                 resume.getId(),
                 "Revise project descriptions on resume",
                 today.plusDays(5),
-                "High",
+                TaskPriority.HIGH,
                 null
         );
         progress(planner, resumeTask1, today.minusDays(5),
@@ -151,7 +151,7 @@ public final class SeedData {
                 resume.getId(),
                 "Update LinkedIn skills and experience",
                 today.plusDays(10),
-                "Medium",
+                TaskPriority.MEDIUM,
                 null
         );
         progress(planner, resumeTask2, today.minusDays(4),
@@ -170,7 +170,7 @@ public final class SeedData {
                 applications.getId(),
                 "Research ten suitable internship opportunities",
                 today.plusDays(30),
-                "Medium",
+                TaskPriority.MEDIUM,
                 null
         );
         progress(planner, applicationsTask1, today.minusDays(6),
@@ -182,7 +182,7 @@ public final class SeedData {
                 applications.getId(),
                 "Submit twenty tailored internship applications",
                 today.plusDays(50),
-                "High",
+                TaskPriority.HIGH,
                 null
         );
         progress(planner, applicationsTask2, today.minusDays(4),
@@ -201,7 +201,7 @@ public final class SeedData {
                 interviews.getId(),
                 "Complete a technical mock interview",
                 today.plusDays(80),
-                "High",
+                TaskPriority.HIGH,
                 null
         );
         progress(planner, interviewsTask1, today.minusDays(5),
@@ -213,7 +213,7 @@ public final class SeedData {
                 interviews.getId(),
                 "Complete a behavioral mock interview",
                 today.plusDays(105),
-                "Medium",
+                TaskPriority.MEDIUM,
                 null
         );
         progress(planner, interviewsTask2, today.minusDays(6),
@@ -225,7 +225,7 @@ public final class SeedData {
         Goal run = planner.createGoal(
                 "Run a 10K",
                 "Build up running endurance to finish a 10K race.",
-                "Health",
+                GoalCategory.HEALTH,
                 today.plusDays(120)
         );
 
@@ -240,7 +240,7 @@ public final class SeedData {
                 three.getId(),
                 "Complete three short training runs",
                 today.plusDays(10),
-                "Medium",
+                TaskPriority.MEDIUM,
                 null
         );
         progress(planner, threeTask1, today.minusDays(6),
@@ -252,7 +252,7 @@ public final class SeedData {
                 three.getId(),
                 "Complete a continuous 3 km practice run",
                 today.plusDays(20),
-                "High",
+                TaskPriority.HIGH,
                 null
         );
         progress(planner, threeTask2, today.minusDays(4),
@@ -271,7 +271,7 @@ public final class SeedData {
                 five.getId(),
                 "Complete two interval-training sessions",
                 today.plusDays(40),
-                "Medium",
+                TaskPriority.MEDIUM,
                 null
         );
         progress(planner, fiveTask1, today.minusDays(5),
@@ -283,7 +283,7 @@ public final class SeedData {
                 five.getId(),
                 "Complete a continuous 5 km practice run",
                 today.plusDays(60),
-                "High",
+                TaskPriority.HIGH,
                 null
         );
         progress(planner, fiveTask2, today.minusDays(6),
@@ -302,7 +302,7 @@ public final class SeedData {
                 eight.getId(),
                 "Complete a 6 km endurance run",
                 today.plusDays(80),
-                "Medium",
+                TaskPriority.MEDIUM,
                 null
         );
         progress(planner, eightTask1, today.minusDays(5),
@@ -314,7 +314,7 @@ public final class SeedData {
                 eight.getId(),
                 "Complete a continuous 8 km practice run",
                 today.plusDays(90),
-                "High",
+                TaskPriority.HIGH,
                 null
         );
         progress(planner, eightTask2, today.minusDays(4),

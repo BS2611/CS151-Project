@@ -6,6 +6,8 @@ import cs151.model.ValidationException;
 import cs151.model.Goal;
 import cs151.model.Milestone;
 import cs151.model.Task;
+import cs151.model.TaskPriority;
+import cs151.model.TaskStatus;
 import cs151.model.GoalPlanner;
 import cs151.view.Motion;
 import javafx.collections.FXCollections;
@@ -16,7 +18,12 @@ import java.io.IOException;
 
 public class TaskController {
 
-    private final GoalPlanner goalPlanner = new GoalPlanner();
+    private final GoalPlanner goalPlanner;
+
+    /** Receives the one shared {@link GoalPlanner} (dependency injection, see {@code Main}). */
+    public TaskController(GoalPlanner goalPlanner) {
+        this.goalPlanner = goalPlanner;
+    }
 
     private Milestone milestone;
 
@@ -36,24 +43,24 @@ public class TaskController {
     private DatePicker dueDatePicker;
 
     @FXML
-    private ComboBox<String> priorityComboBox;
+    private ComboBox<TaskPriority> priorityComboBox;
 
     @FXML
-    private ComboBox<String> statusComboBox;
+    private ComboBox<TaskStatus> statusComboBox;
 
     @FXML
     private void initialize() {
         priorityComboBox.setItems(
-                FXCollections.observableArrayList(Task.PRIORITIES)
+                FXCollections.observableArrayList(TaskPriority.values())
         );
 
-        priorityComboBox.setValue(Task.DEFAULT_PRIORITY);
+        priorityComboBox.setValue(TaskPriority.MEDIUM);
 
         statusComboBox.setItems(
-                FXCollections.observableArrayList(Task.STATUSES)
+                FXCollections.observableArrayList(TaskStatus.values())
         );
 
-        statusComboBox.setValue(Task.STATUS_TO_DO);
+        statusComboBox.setValue(TaskStatus.TO_DO);
     }
 
     public void setMilestone(Milestone milestone) {
@@ -95,8 +102,8 @@ public class TaskController {
     private void clearForm() {
         descriptionField.clear();
         dueDatePicker.setValue(null);
-        priorityComboBox.setValue(Task.DEFAULT_PRIORITY);
-        statusComboBox.setValue(Task.STATUS_TO_DO);
+        priorityComboBox.setValue(TaskPriority.MEDIUM);
+        statusComboBox.setValue(TaskStatus.TO_DO);
     }
 
     @FXML

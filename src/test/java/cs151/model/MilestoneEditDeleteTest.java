@@ -22,14 +22,14 @@ class MilestoneEditDeleteTest extends BackendTestBase {
                 milestone.getId(),
                 "Renamed Milestone",
                 newTargetDate,
-                "In Progress"
+                MilestoneStatus.IN_PROGRESS
         );
 
         Milestone stored = planner.getMilestone(milestone.getId());
 
         assertEquals("Renamed Milestone", stored.getMilestoneName());
         assertEquals(newTargetDate, stored.getTargetDate());
-        assertEquals("In Progress", stored.getStatus());
+        assertEquals(MilestoneStatus.IN_PROGRESS, stored.getStatus());
         assertEquals(goal.getId(), stored.getGoalId());
     }
 
@@ -45,7 +45,7 @@ class MilestoneEditDeleteTest extends BackendTestBase {
                         milestone.getId(),
                         "Milestone",
                         today.plusDays(4),
-                        "In Progress"
+                        MilestoneStatus.IN_PROGRESS
                 )
         );
 

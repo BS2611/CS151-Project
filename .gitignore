@@ -26,3 +26,5 @@ data/
 .vscode/
 UI_STYLE_GUIDE.md
 Goal_Planner_Core_Flows.pdf
+# Course lecture slides (professor's material, keep local only)
+docs/reference/lecture-notes/

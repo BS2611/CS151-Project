@@ -25,7 +25,12 @@ import java.time.LocalDate;
  */
 public class ProgressController {
 
-    private final GoalPlanner goalPlanner = new GoalPlanner();
+    private final GoalPlanner goalPlanner;
+
+    /** Receives the one shared {@link GoalPlanner} (dependency injection, see {@code Main}). */
+    public ProgressController(GoalPlanner goalPlanner) {
+        this.goalPlanner = goalPlanner;
+    }
 
     /** The milestone of the opened task; used to go back to that milestone's Task list. */
     private Milestone milestone;

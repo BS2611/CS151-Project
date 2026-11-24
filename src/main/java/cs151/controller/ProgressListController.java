@@ -19,7 +19,12 @@ import java.io.IOException;
  */
 public class ProgressListController {
 
-    private final GoalPlanner goalPlanner = new GoalPlanner();
+    private final GoalPlanner goalPlanner;
+
+    /** Receives the one shared {@link GoalPlanner} (dependency injection, see {@code Main}). */
+    public ProgressListController(GoalPlanner goalPlanner) {
+        this.goalPlanner = goalPlanner;
+    }
 
     private Task task;
 

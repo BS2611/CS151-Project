@@ -358,7 +358,7 @@ public class FileSystemDAL implements DAL {
         String q = normalize(query);
         List<Goal> found = new ArrayList<>();
         for (Goal g : load().goals) {
-            if (matches(q, g.getName(), g.getDescription(), g.getCategory(), g.getStatus(),
+            if (matches(q, g.getName(), g.getDescription(), g.getCategory().label(), g.getStatus().label(),
                     String.valueOf(g.getTargetDate()), String.valueOf(g.getCreationDate()),
                     String.valueOf(g.getProgress()))) {
                 found.add(g);
@@ -373,7 +373,7 @@ public class FileSystemDAL implements DAL {
         String q = normalize(query);
         List<Milestone> found = new ArrayList<>();
         for (Milestone m : load().milestones) {
-            if (matches(q, m.getMilestoneName(), String.valueOf(m.getTargetDate()), m.getStatus())) {
+            if (matches(q, m.getMilestoneName(), String.valueOf(m.getTargetDate()), m.getStatus().label())) {
                 found.add(m);
             }
         }
@@ -386,7 +386,8 @@ public class FileSystemDAL implements DAL {
         String q = normalize(query);
         List<Task> found = new ArrayList<>();
         for (Task t : load().tasks) {
-            if (matches(q, t.getDescription(), String.valueOf(t.getDueDate()), t.getPriority(), t.getStatus())) {
+            if (matches(q, t.getDescription(), String.valueOf(t.getDueDate()), t.getPriority().label(),
+                    t.getStatus().label())) {
                 found.add(t);
             }
         }
@@ -444,18 +445,22 @@ public class FileSystemDAL implements DAL {
             List<String> f = splitRecord(line);
             try {
                 switch (f.get(0)) {
-                    case GOAL -> s.goals.add(new Goal(Long.parseLong(f.get(1)), f.get(2), f.get(3), f.get(4),
-                            LocalDate.parse(f.get(5)), f.get(6), Integer.parseInt(f.get(7)),
+                    case GOAL -> s.goals.add(new Goal(Long.parseLong(f.get(1)), f.get(2), f.get(3),
+                            GoalCategory.fromLabel(f.get(4)), LocalDate.parse(f.get(5)),
+                            GoalStatus.fromLabel(f.get(6)), Integer.parseInt(f.get(7)),
                             LocalDate.parse(f.get(8))));
                     case MILESTONE -> s.milestones.add(new Milestone(Long.parseLong(f.get(1)),
-                            Long.parseLong(f.get(2)), f.get(3), LocalDate.parse(f.get(4)), f.get(5)));
+                            Long.parseLong(f.get(2)), f.get(3), LocalDate.parse(f.get(4)),
+                            MilestoneStatus.fromLabel(f.get(5))));
                     case TASK -> s.tasks.add(new Task(Long.parseLong(f.get(1)), Long.parseLong(f.get(2)), f.get(3),
-                            LocalDate.parse(f.get(4)), f.get(5), f.get(6), parseDate(f.get(7))));
+                            LocalDate.parse(f.get(4)), TaskPriority.fromLabel(f.get(5)),
+                            TaskStatus.fromLabel(f.get(6)), parseDate(f.get(7))));
                     case PROGRESS -> s.entries.add(new ProgressEntry(Long.parseLong(f.get(1)),
                             Long.parseLong(f.get(2)), LocalDate.parse(f.get(3)), f.get(4)));
                     default -> { /* unknown record kind: skip */ }
                 }
-            } catch (NumberFormatException | DateTimeParseException | IndexOutOfBoundsException damaged) {
+            } catch (NumberFormatException | DateTimeParseException | IndexOutOfBoundsException
+                     | PersistenceException | ValidationException damaged) {
                 // skip a damaged line instead of failing the whole page
             }
         }
@@ -465,17 +470,17 @@ public class FileSystemDAL implements DAL {
     private void save(Store s) {
         List<String> lines = new ArrayList<>();
         for (Goal g : s.goals) {
-            lines.add(record(GOAL, String.valueOf(g.getId()), g.getName(), g.getDescription(), g.getCategory(),
-                    String.valueOf(g.getTargetDate()), g.getStatus(), String.valueOf(g.getProgress()),
+            lines.add(record(GOAL, String.valueOf(g.getId()), g.getName(), g.getDescription(), g.getCategory().label(),
+                    String.valueOf(g.getTargetDate()), g.getStatus().label(), String.valueOf(g.getProgress()),
                     String.valueOf(g.getCreationDate())));
         }
         for (Milestone m : s.milestones) {
             lines.add(record(MILESTONE, String.valueOf(m.getId()), String.valueOf(m.getGoalId()),
-                    m.getMilestoneName(), String.valueOf(m.getTargetDate()), m.getStatus()));
+                    m.getMilestoneName(), String.valueOf(m.getTargetDate()), m.getStatus().label()));
         }
         for (Task t : s.tasks) {
             lines.add(record(TASK, String.valueOf(t.getId()), String.valueOf(t.getMilestoneId()), t.getDescription(),
-                    String.valueOf(t.getDueDate()), t.getPriority(), t.getStatus(),
+                    String.valueOf(t.getDueDate()), t.getPriority().label(), t.getStatus().label(),
                     t.getCompletionDate() == null ? "" : t.getCompletionDate().toString()));
         }
         for (ProgressEntry e : s.entries) {
