@@ -60,6 +60,9 @@
                     <Label fx:id="messageLabel" text="Select a goal, then add or view its milestones. Double-click a row to open its milestones."
                            styleClass="helper-text" wrapText="true" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
                     </HBox>
+                    <Button minWidth="-Infinity" text="Back" onAction="#goBack" styleClass="secondary-button" contentDisplay="LEFT" graphicTextGap="8.0">
+                        <graphic><FontIcon iconLiteral="fas-arrow-left"/></graphic>
+                    </Button>
                     <Button minWidth="-Infinity" text="Refresh" onAction="#refreshClicked" styleClass="secondary-button" contentDisplay="LEFT" graphicTextGap="8.0">
                         <graphic><FontIcon fx:id="refreshIcon" iconLiteral="fas-sync-alt"/></graphic>
                     </Button>

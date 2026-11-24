@@ -42,6 +42,16 @@
                            styleClass="page-subtitle" wrapText="true"/>
                     <Button minWidth="-Infinity" fx:id="viewGoalsButton" text="List Goals" onAction="#openGoalListPage" styleClass="secondary-button"/>
                 </VBox>
+                <VBox styleClass="action-card" HBox.hgrow="ALWAYS" onMouseClicked="#openSearchPage">
+                    <Label text="Search" styleClass="section-title"/>
+                    <Label text="Search across your goals, milestones, and tasks."
+                           styleClass="page-subtitle" wrapText="true"/>
+                    <Button minWidth="-Infinity"
+                            fx:id="searchButton"
+                            text="Search"
+                            onAction="#openSearchPage"
+                            styleClass="secondary-button"/>
+                </VBox>
             </HBox>
 
         </VBox>

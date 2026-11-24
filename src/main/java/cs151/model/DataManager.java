@@ -226,6 +226,7 @@ public class DataManager implements DAL {
                 rs.getInt("progress"), date(rs, "creation_date"));
     }
 
+    @Override
     public long insertGoal(Goal goal) {
         long id = write(c -> {
             try (PreparedStatement ps = c.prepareStatement(
@@ -245,6 +246,7 @@ public class DataManager implements DAL {
         return id;
     }
 
+    @Override
     public boolean updateGoal(Goal goal) {
         return write(c -> {
             try (PreparedStatement ps = c.prepareStatement(
@@ -264,21 +266,25 @@ public class DataManager implements DAL {
     }
 
     /** Deletes the goal; SQLite cascades to its milestones, tasks and progress entries. */
+    @Override
     public boolean deleteGoal(long goalId) {
         return deleteById("goals", goalId);
     }
 
+    @Override
     public Optional<Goal> findGoalById(long goalId) {
         return queryOne("SELECT * FROM goals WHERE id = ?", goalId, DataManager::mapGoal);
     }
 
     /** Exact (case-sensitive) match on the trimmed name. */
+    @Override
     public Optional<Goal> findGoalByName(String name) {
         List<Goal> found = queryList("SELECT * FROM goals WHERE name = ?", name == null ? "" : name.trim(),
                 DataManager::mapGoal);
         return found.isEmpty() ? Optional.empty() : Optional.of(found.get(0));
     }
 
+    @Override
     public List<Goal> getAllGoals() {
         return queryList("SELECT * FROM goals ORDER BY target_date, name", null, DataManager::mapGoal);
     }
@@ -290,6 +296,7 @@ public class DataManager implements DAL {
                 date(rs, "target_date"), rs.getString("status"));
     }
 
+    @Override
     public long insertMilestone(Milestone m) {
         long id = write(c -> {
             try (PreparedStatement ps = c.prepareStatement(
@@ -306,6 +313,7 @@ public class DataManager implements DAL {
         return id;
     }
 
+    @Override
     public boolean updateMilestone(Milestone m) {
         return write(c -> {
             try (PreparedStatement ps = c.prepareStatement(
@@ -320,14 +328,17 @@ public class DataManager implements DAL {
     }
 
     /** Deletes the milestone; SQLite cascades to its tasks and their progress entries. */
+    @Override
     public boolean deleteMilestone(long milestoneId) {
         return deleteById("milestones", milestoneId);
     }
 
+    @Override
     public Optional<Milestone> findMilestoneById(long milestoneId) {
         return queryOne("SELECT * FROM milestones WHERE id = ?", milestoneId, DataManager::mapMilestone);
     }
 
+    @Override
     public List<Milestone> getMilestonesForGoal(long goalId) {
         return queryList("SELECT * FROM milestones WHERE goal_id = ? ORDER BY target_date, name", goalId,
                 DataManager::mapMilestone);
@@ -341,6 +352,7 @@ public class DataManager implements DAL {
                 date(rs, "completion_date"));
     }
 
+    @Override
     public long insertTask(Task t) {
         long id = write(c -> {
             try (PreparedStatement ps = c.prepareStatement(
@@ -359,6 +371,7 @@ public class DataManager implements DAL {
         return id;
     }
 
+    @Override
     public boolean updateTask(Task t) {
         return write(c -> {
             try (PreparedStatement ps = c.prepareStatement(
@@ -376,14 +389,17 @@ public class DataManager implements DAL {
     }
 
     /** Deletes the task; SQLite cascades to its progress entries. */
+    @Override
     public boolean deleteTask(long taskId) {
         return deleteById("tasks", taskId);
     }
 
+    @Override
     public Optional<Task> findTaskById(long taskId) {
         return queryOne("SELECT * FROM tasks WHERE id = ?", taskId, DataManager::mapTask);
     }
 
+    @Override
     public List<Task> getTasksForMilestone(long milestoneId) {
         return queryList("SELECT * FROM tasks WHERE milestone_id = ? ORDER BY due_date, description", milestoneId,
                 DataManager::mapTask);
@@ -396,6 +412,7 @@ public class DataManager implements DAL {
                 rs.getString("note"));
     }
 
+    @Override
     public long insertProgressEntry(ProgressEntry e) {
         long id = write(c -> {
             try (PreparedStatement ps = c.prepareStatement(
@@ -412,6 +429,7 @@ public class DataManager implements DAL {
     }
 
     /** Only the note can change; the entry date is fixed at creation. */
+    @Override
     public boolean updateProgressEntry(ProgressEntry e) {
         return write(c -> {
             try (PreparedStatement ps = c.prepareStatement("UPDATE progress_entries SET note = ? WHERE id = ?")) {
@@ -422,14 +440,17 @@ public class DataManager implements DAL {
         });
     }
 
+    @Override
     public boolean deleteProgressEntry(long entryId) {
         return deleteById("progress_entries", entryId);
     }
 
+    @Override
     public Optional<ProgressEntry> findProgressEntryById(long entryId) {
         return queryOne("SELECT * FROM progress_entries WHERE id = ?", entryId, DataManager::mapProgress);
     }
 
+    @Override
     public List<ProgressEntry> getProgressEntriesForTask(long taskId) {
         return queryList("SELECT * FROM progress_entries WHERE task_id = ? ORDER BY entry_date, id", taskId,
                 DataManager::mapProgress);
@@ -469,21 +490,25 @@ public class DataManager implements DAL {
         });
     }
 
-    /** Goals whose name, description, category or status contains the text (case-insensitive). */
+    /** Goals whose name, description, category, status, target date, creation date or progress contains the text. */
+    @Override
     public List<Goal> searchGoals(String query) {
-        return searchTable("goals", new String[]{"name", "description", "category", "status"},
+        return searchTable("goals", new String[]{"name", "description", "category", "status", "target_date",
+                        "creation_date", "CAST(progress AS TEXT)"},
                 "target_date, name", query, DataManager::mapGoal);
     }
 
-    /** Milestones whose name or status contains the text (case-insensitive). */
+    /** Milestones whose name, target date or status contains the text (case-insensitive). */
+    @Override
     public List<Milestone> searchMilestones(String query) {
-        return searchTable("milestones", new String[]{"name", "status"}, "target_date, name", query,
+        return searchTable("milestones", new String[]{"name", "target_date", "status"}, "target_date, name", query,
                 DataManager::mapMilestone);
     }
 
-    /** Tasks whose description, priority or status contains the text (case-insensitive). */
+    /** Tasks whose description, due date, priority or status contains the text (case-insensitive). */
+    @Override
     public List<Task> searchTasks(String query) {
-        return searchTable("tasks", new String[]{"description", "priority", "status"}, "due_date, description",
+        return searchTable("tasks", new String[]{"description", "due_date", "priority", "status"}, "due_date, description",
                 query, DataManager::mapTask);
     }
 }

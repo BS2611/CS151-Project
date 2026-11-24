@@ -521,3 +521,11 @@
 .danger-button { -fx-background-color: -ds-danger; -fx-background-radius: 9; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 20 10 20; -fx-cursor: hand; }
 .danger-button:hover { -fx-background-color: #B91C1C; }
 .danger-button .ikonli-font-icon { -fx-icon-size: 13; -fx-icon-color: white; }
+
+/* Quick-search pop-up under the top bar search box (a separate window, so plain colors instead of root variables). */
+.suggest-list { -fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #E5E7EB; -fx-border-radius: 12; -fx-padding: 4; -fx-effect: dropshadow(gaussian, rgba(17,24,39,0.18), 18, 0.1, 0, 6); }
+.suggest-list .list-cell { -fx-background-color: transparent; -fx-background-radius: 8; -fx-padding: 6 10 6 10; -fx-font-size: 13px; }
+.suggest-list .list-cell:filled:hover, .suggest-list .list-cell:filled:selected { -fx-background-color: #EEF0FF; }
+.suggest-kind { -fx-background-color: #F3F4F6; -fx-background-radius: 6; -fx-padding: 2 8 2 8; -fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #4B5563; }
+.suggest-text { -fx-text-fill: #111827; -fx-font-weight: bold; }
+.suggest-detail { -fx-text-fill: #6B7280; -fx-font-size: 12px; }

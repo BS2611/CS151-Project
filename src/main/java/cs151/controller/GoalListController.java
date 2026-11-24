@@ -5,6 +5,7 @@ import cs151.model.Goal;
 import cs151.model.Milestone;
 import cs151.model.GoalPlanner;
 import cs151.view.GoalDialogs;
+import cs151.view.Debounce;
 import cs151.view.Motion;
 import cs151.view.Pills;
 import javafx.beans.property.ReadOnlyIntegerWrapper;
@@ -390,10 +391,12 @@ public class GoalListController {
             applyFilters();
         });
 
-        searchField.textProperty().addListener((observable, old, text) -> {
+        // Filter only after the user pauses typing, not on every key.
+        Debounce searchPause = new Debounce(Debounce.SEARCH_DELAY, () -> {
             pageIndex = 0;
             applyFilters();
         });
+        searchField.textProperty().addListener((observable, old, text) -> searchPause.trigger());
         statusFilter.valueProperty().addListener((observable, old, value) -> {
             pageIndex = 0;
             applyFilters();

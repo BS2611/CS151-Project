@@ -1,28 +1,29 @@
 package cs151.model;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
- * Main backend API for the frontend. Validates input, enforces the business rules and delegates storage to
- * {@link DataManager}. Every method either returns the saved/loaded object or throws a
- * {@link ValidationException} (or subclass) whose message can be shown to the user directly.
+ * Main backend API for the frontend (the <em>Facade</em> of the model). Validates input, enforces the business rules
+ * and delegates all storage to a {@link DAL} (the <em>Strategy</em>), so it works the same with
+ * {@link DataManager} (SQLite) or {@link FileSystemDAL} (text file). Every method either returns the saved/loaded
+ * object or throws a {@link ValidationException} (or subclass) whose message can be shown to the user directly.
  */
-
 public class GoalPlanner {
-    private final DataManager dataManager;
-    //Goal persistence uses the DAL abstraction so storage can be changed to db later.
-    private final DAL goalDal;
+    private final DAL dal;
 
-    /** Uses the sqlite to store goals. */
+    /** Uses SQLite (the default database file) for everything. */
     public GoalPlanner() {
-        this.dataManager = new DataManager();
-        this.goalDal = new DataManager();
+        this(new DataManager());
     }
 
-    public GoalPlanner(DataManager dataManager) {
-        this.dataManager = dataManager;
-        this.goalDal = dataManager;
+    /** Uses the given {@link DAL} for everything (goals, milestones, tasks, progress entries and search). */
+    public GoalPlanner(DAL dal) {
+        this.dal = dal;
     }
 
     // ------------------------------------------------------------------ goals
@@ -33,7 +34,7 @@ public class GoalPlanner {
                 progress);
         validateGoal(goal);
         requireTargetDateNotPast(goal.getTargetDate());
-        goalDal.insertGoal(goal);
+        dal.insertGoal(goal);
         return goal;
     }
 
@@ -76,12 +77,12 @@ public class GoalPlanner {
         if (!goal.getTargetDate().equals(oldTargetDate)) {
             requireTargetDateNotPast(goal.getTargetDate());
         }
-        for (Milestone m : dataManager.getMilestonesForGoal(goalId)) {
+        for (Milestone m : dal.getMilestonesForGoal(goalId)) {
             if (m.getTargetDate().isAfter(goal.getTargetDate())) {
                 throw new ValidationException("Goal target date cannot be earlier than a milestone target date.");
             }
         }
-        goalDal.updateGoal(goal);
+        dal.updateGoal(goal);
         return goal;
     }
 
@@ -93,11 +94,11 @@ public class GoalPlanner {
         int milestones = 0;
         int tasks = 0;
         int progresses = 0;
-        for (Milestone m : dataManager.getMilestonesForGoal(goalId)) {
+        for (Milestone m : dal.getMilestonesForGoal(goalId)) {
             milestones++;
-            for (Task t : dataManager.getTasksForMilestone(m.getId())) {
+            for (Task t : dal.getTasksForMilestone(m.getId())) {
                 tasks++;
-                progresses += dataManager.getProgressEntriesForTask(t.getId()).size();
+                progresses += dal.getProgressEntriesForTask(t.getId()).size();
             }
         }
         return new GoalDeletionImpact(milestones, tasks, progresses);
@@ -105,22 +106,22 @@ public class GoalPlanner {
 
     /** Deletes the goal and, by cascade, its milestones, tasks and progress entries. */
     public void deleteGoal(long goalId) {
-        if (!goalDal.deleteGoal(goalId)) throw new NotFoundException("Goal not found.");
+        if (!dal.deleteGoal(goalId)) throw new NotFoundException("Goal not found.");
     }
 
     public Goal getGoal(long goalId) {
-        return goalDal.findGoalById(goalId).orElseThrow(() -> new NotFoundException("Goal not found."));
+        return dal.findGoalById(goalId).orElseThrow(() -> new NotFoundException("Goal not found."));
     }
 
     public List<Goal> getAllGoals() {
-        return goalDal.getAllGoals();
+        return dal.getAllGoals();
     }
 
     /** Sets a goal's progress (0-100); a Completed goal must remain at 100. */
     public Goal updateGoalProgress(long goalId, int progress) {
         Goal goal = getGoal(goalId);
         goal.updateProgress(progress);
-        goalDal.updateGoal(goal);
+        dal.updateGoal(goal);
         return goal;
     }
 
@@ -128,13 +129,13 @@ public class GoalPlanner {
     public Goal markGoalCompleted(long goalId) {
         Goal goal = getGoal(goalId);
         goal.markCompleted();
-        goalDal.updateGoal(goal);
+        dal.updateGoal(goal);
         return goal;
     }
 
     private void validateGoal(Goal goal) {
         if (goal.getName().isEmpty()) throw new ValidationException("Goal name is required.");
-        goalDal.findGoalByName(goal.getName()).ifPresent(existing -> {
+        dal.findGoalByName(goal.getName()).ifPresent(existing -> {
             if (existing.getId() != goal.getId()) throw new DuplicateEntityException("Goal name already exists.");
         });
         if (goal.getCategory() == null || !Goal.CATEGORIES.contains(goal.getCategory())) {
@@ -163,7 +164,7 @@ public class GoalPlanner {
         Goal goal = getGoal(goalId);
         Milestone m = new Milestone(goalId, name, targetDate, defaultIfBlank(status, Milestone.STATUS_NOT_STARTED));
         validateMilestone(m, goal);
-        dataManager.insertMilestone(m);
+        dal.insertMilestone(m);
         return m;
     }
 
@@ -174,39 +175,39 @@ public class GoalPlanner {
         m.setTargetDate(targetDate);
         m.setStatus(defaultIfBlank(status, Milestone.STATUS_NOT_STARTED));
         validateMilestone(m, getGoal(m.getGoalId()));
-        for (Task t : dataManager.getTasksForMilestone(milestoneId)) {
+        for (Task t : dal.getTasksForMilestone(milestoneId)) {
             if (t.getDueDate().isAfter(m.getTargetDate())) {
                 throw new ValidationException("Milestone target date cannot be earlier than a task due date.");
             }
         }
-        dataManager.updateMilestone(m);
+        dal.updateMilestone(m);
         return m;
     }
 
     /** Deletes the milestone and, by cascade, its tasks and their progress entries. */
     public void deleteMilestone(long milestoneId) {
-        if (!dataManager.deleteMilestone(milestoneId)) throw new NotFoundException("Milestone not found.");
+        if (!dal.deleteMilestone(milestoneId)) throw new NotFoundException("Milestone not found.");
     }
 
     public Milestone getMilestone(long milestoneId) {
-        return dataManager.findMilestoneById(milestoneId)
+        return dal.findMilestoneById(milestoneId)
                 .orElseThrow(() -> new NotFoundException("Milestone not found."));
     }
 
     public List<Milestone> getMilestonesForGoal(long goalId) {
-        return dataManager.getMilestonesForGoal(goalId);
+        return dal.getMilestonesForGoal(goalId);
     }
 
     public Milestone markMilestoneCompleted(long milestoneId) {
         Milestone m = getMilestone(milestoneId);
         m.markCompleted();
-        dataManager.updateMilestone(m);
+        dal.updateMilestone(m);
         return m;
     }
 
     private void validateMilestone(Milestone m, Goal goal) {
         if (m.getMilestoneName().isEmpty()) throw new ValidationException("Milestone name is required.");
-        for (Milestone other : dataManager.getMilestonesForGoal(goal.getId())) {
+        for (Milestone other : dal.getMilestonesForGoal(goal.getId())) {
             if (other.getId() != m.getId() && other.getMilestoneName().equals(m.getMilestoneName())) {
                 throw new DuplicateEntityException("Milestone name already exists for this goal.");
             }
@@ -229,7 +230,7 @@ public class GoalPlanner {
         Task t = new Task(milestoneId, description, dueDate, defaultIfBlank(priority, Task.DEFAULT_PRIORITY),
                 defaultIfBlank(status, Task.STATUS_TO_DO));
         validateTask(t, milestone);
-        dataManager.insertTask(t);
+        dal.insertTask(t);
         return t;
     }
 
@@ -244,33 +245,33 @@ public class GoalPlanner {
         t.setPriority(defaultIfBlank(priority, Task.DEFAULT_PRIORITY));
         t.setStatus(defaultIfBlank(status, Task.STATUS_TO_DO));
         validateTask(t, getMilestone(t.getMilestoneId()));
-        dataManager.updateTask(t);
+        dal.updateTask(t);
         return t;
     }
 
     /** Deletes the task and, by cascade, its progress entries. */
     public void deleteTask(long taskId) {
-        if (!dataManager.deleteTask(taskId)) throw new NotFoundException("Task not found.");
+        if (!dal.deleteTask(taskId)) throw new NotFoundException("Task not found.");
     }
 
     public Task getTask(long taskId) {
-        return dataManager.findTaskById(taskId).orElseThrow(() -> new NotFoundException("Task not found."));
+        return dal.findTaskById(taskId).orElseThrow(() -> new NotFoundException("Task not found."));
     }
 
     public List<Task> getTasksForMilestone(long milestoneId) {
-        return dataManager.getTasksForMilestone(milestoneId);
+        return dal.getTasksForMilestone(milestoneId);
     }
 
     public Task markTaskCompleted(long taskId) {
         Task t = getTask(taskId);
         t.markCompleted();
-        dataManager.updateTask(t);
+        dal.updateTask(t);
         return t;
     }
 
     private void validateTask(Task t, Milestone milestone) {
         if (t.getDescription().isEmpty()) throw new ValidationException("Task description is required.");
-        for (Task other : dataManager.getTasksForMilestone(milestone.getId())) {
+        for (Task other : dal.getTasksForMilestone(milestone.getId())) {
             if (other.getId() != t.getId() && other.getDescription().equals(t.getDescription())) {
                 throw new DuplicateEntityException("Task description already exists for this milestone.");
             }
@@ -294,7 +295,7 @@ public class GoalPlanner {
         getTask(taskId);
         ProgressEntry entry = new ProgressEntry(taskId, note);
         requireNote(entry);
-        dataManager.insertProgressEntry(entry);
+        dal.insertProgressEntry(entry);
         return entry;
     }
 
@@ -306,26 +307,26 @@ public class GoalPlanner {
         getTask(taskId);
         ProgressEntry entry = new ProgressEntry(0, taskId, entryDate, note);
         requireNote(entry);
-        dataManager.insertProgressEntry(entry);
+        dal.insertProgressEntry(entry);
         return entry;
     }
 
     /** Changes the note of an entry; its date stays as it was. */
     public ProgressEntry updateProgressEntry(long entryId, String note) {
-        ProgressEntry entry = dataManager.findProgressEntryById(entryId)
+        ProgressEntry entry = dal.findProgressEntryById(entryId)
                 .orElseThrow(() -> new NotFoundException("Progress entry not found."));
         entry.setNote(note);
         requireNote(entry);
-        dataManager.updateProgressEntry(entry);
+        dal.updateProgressEntry(entry);
         return entry;
     }
 
     public void deleteProgressEntry(long entryId) {
-        if (!dataManager.deleteProgressEntry(entryId)) throw new NotFoundException("Progress entry not found.");
+        if (!dal.deleteProgressEntry(entryId)) throw new NotFoundException("Progress entry not found.");
     }
 
     public List<ProgressEntry> getProgressEntriesForTask(long taskId) {
-        return dataManager.getProgressEntriesForTask(taskId);
+        return dal.getProgressEntriesForTask(taskId);
     }
 
     private void requireNote(ProgressEntry entry) {
@@ -335,13 +336,58 @@ public class GoalPlanner {
     // ------------------------------------------------------------------ search
 
     /**
-     * Global, case-insensitive search. Goals match on name, description, category or status; milestones on
-     * name or status; tasks on description, priority or status. A blank query returns no results.
+     * Global, case-insensitive search. Goals match on name, description, category, status, dates or progress;
+     * milestones on name, target date or status; tasks on description, due date, priority or status. A blank query returns no results.
      */
     public SearchResults search(String query) {
-        if (query == null || query.isBlank()) return new SearchResults(List.of(), List.of(), List.of());
-        return new SearchResults(dataManager.searchGoals(query), dataManager.searchMilestones(query),
-                dataManager.searchTasks(query));
+        if (query == null || query.isBlank()) {
+            return new SearchResults(List.of(), List.of(), List.of());
+        }
+
+        return new SearchResults(
+                dal.searchGoals(query),
+                dal.searchMilestones(query),
+                dal.searchTasks(query)
+        );
+    }
+
+    /**
+     * Returns every Goal related to the search text.
+     * A Goal is returned when the text matches the Goal itself,
+     * one of its Milestones, or one of its Tasks.
+     * Each Goal appears only once.
+     */
+    public List<Goal> searchRelatedGoals(String query) {
+        SearchResults results = search(query);
+
+        Map<Long, Goal> uniqueGoals = new LinkedHashMap<>();
+
+        for (Goal goal : results.goals()) {
+            uniqueGoals.put(goal.getId(), goal);
+        }
+
+        for (Milestone milestone : results.milestones()) {
+            Goal goal = getGoal(milestone.getGoalId());
+            uniqueGoals.put(goal.getId(), goal);
+        }
+
+        for (Task task : results.tasks()) {
+            Milestone milestone = getMilestone(task.getMilestoneId());
+            Goal goal = getGoal(milestone.getGoalId());
+            uniqueGoals.put(goal.getId(), goal);
+        }
+
+        List<Goal> goals = new ArrayList<>(uniqueGoals.values());
+
+        goals.sort(
+                Comparator.comparing(Goal::getTargetDate)
+                        .thenComparing(
+                                Goal::getName,
+                                String.CASE_INSENSITIVE_ORDER
+                        )
+        );
+
+        return goals;
     }
 
     private static String defaultIfBlank(String value, String fallback) {
