@@ -1,112 +1,80 @@
 package cs151.model;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.LocalDate;
+import java.io.IOException;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/** Checks that GoalPlanner works with a different DAL (the text-file one) and that FileSystemDAL is correct. */
-class FileSystemDalTest {
-    @TempDir
-    Path tempDir;
+/** The text-file strategy ({@link FileSystemDAL}) must pass the DAL contract and keep its file readable. */
+class FileSystemDalTest extends DalContractTest {
+    private Path file;
 
-    private Path goalFile;
-    private FileSystemDAL dal;
-    private GoalPlanner planner;
-    private final LocalDate today = LocalDate.now();
-
-    @BeforeEach
-    void setUp() {
-        goalFile = tempDir.resolve("goals.txt");
-        dal = new FileSystemDAL(goalFile);
-        planner = new GoalPlanner(dal, new DataManager(tempDir.resolve("test.db")));
-    }
-
-    private Goal newGoal(String name) {
-        return planner.createGoal(name, "desc", "Academic", today.plusDays(30), "Not Started", 0);
+    @Override
+    protected DAL createDal(Path folder) {
+        file = folder.resolve("data").resolve("tracker.txt");   // the folder is created by the DAL
+        return new FileSystemDAL(file);
     }
 
     @Test
-    void plannerStoresAndReloadsGoalsThroughTheInjectedDal() {
-        Goal saved = newGoal("Learn Java");
+    void everythingIsStillThereAfterReopeningTheFile() {
+        Goal g = planner.createGoal("Persist", "d", "Other", today.plusDays(30), null, 0);
+        Milestone m = planner.createMilestone(g.getId(), "M", today.plusDays(10), null);
+        Task t = planner.createTask(m.getId(), "T", today.plusDays(5), null, null);
+        planner.addProgressEntry(t.getId(), "note");
 
-        assertEquals(1, saved.getId());
-        Goal loaded = new FileSystemDAL(goalFile).findGoalById(saved.getId()).orElseThrow();
-        assertEquals("Learn Java", loaded.getName());
-        assertEquals("Academic", loaded.getCategory());
-        assertEquals(today.plusDays(30), loaded.getTargetDate());
-        assertEquals(1, planner.getAllGoals().size());
+        GoalPlanner reopened = new GoalPlanner(new FileSystemDAL(file));
+
+        assertEquals("Persist", reopened.getGoal(g.getId()).getName());
+        assertEquals(1, reopened.getMilestonesForGoal(g.getId()).size());
+        assertEquals(1, reopened.getTasksForMilestone(m.getId()).size());
+        assertEquals("note", reopened.getProgressEntriesForTask(t.getId()).get(0).getNote());
     }
 
     @Test
-    void updateIsSavedToTheFile() {
-        Goal goal = newGoal("Run a 5K");
-
-        planner.updateGoal(goal.getId(), "Run a 10K", "longer", "Health", today.plusDays(60), "In Progress", 40);
-
-        Goal reloaded = new FileSystemDAL(goalFile).findGoalById(goal.getId()).orElseThrow();
-        assertEquals("Run a 10K", reloaded.getName());
-        assertEquals("In Progress", reloaded.getStatus());
-        assertEquals(40, reloaded.getProgress());
-    }
-
-    @Test
-    void markCompletedAndProgressAreSaved() {
-        Goal goal = newGoal("Read a book");
-
-        planner.updateGoalProgress(goal.getId(), 55);
-        assertEquals(55, new FileSystemDAL(goalFile).findGoalById(goal.getId()).orElseThrow().getProgress());
-
-        planner.markGoalCompleted(goal.getId());
-        Goal done = new FileSystemDAL(goalFile).findGoalById(goal.getId()).orElseThrow();
-        assertEquals("Completed", done.getStatus());
-        assertEquals(100, done.getProgress());
-    }
-
-    @Test
-    void deleteRemovesTheGoalAndIdsAreNotReused() {
-        Goal first = newGoal("First");
-        Goal second = newGoal("Second");
-
+    void idsAreNotReusedAfterADelete() {
+        Goal first = planner.createGoal("First", "d", "Other", today.plusDays(30), null, 0);
+        Goal second = planner.createGoal("Second", "d", "Other", today.plusDays(31), null, 0);
         planner.deleteGoal(first.getId());
-        Goal third = newGoal("Third");
+        Goal third = planner.createGoal("Third", "d", "Other", today.plusDays(32), null, 0);
 
-        assertFalse(dal.findGoalById(first.getId()).isPresent());
-        assertTrue(dal.findGoalById(second.getId()).isPresent());
-        assertEquals(3, third.getId());
-        assertThrows(NotFoundException.class, () -> planner.deleteGoal(first.getId()));
-    }
-
-    @Test
-    void businessRulesStillApplyWhenTheDalIsDifferent() {
-        newGoal("Unique name");
-
-        assertThrows(DuplicateEntityException.class, () -> newGoal("Unique name"));
-        assertThrows(NotFoundException.class, () -> planner.getGoal(99));
+        assertEquals(second.getId() + 1, third.getId());
     }
 
     @Test
     void separatorsAndLineBreaksInTextSurviveTheFile() {
-        Goal goal = planner.createGoal("A | B \\ C", "line one\nline two | end", "Other",
-                today.plusDays(5), "Not Started", 0);
+        Goal g = planner.createGoal("A | B \\ C", "line one\nline two | end", "Other", today.plusDays(5), null, 0);
+        Milestone m = planner.createMilestone(g.getId(), "pipe | milestone", today.plusDays(2), null);
+        Task t = planner.createTask(m.getId(), "task\\with\\backslashes", today.plusDays(1), null, null);
+        planner.addProgressEntry(t.getId(), "multi\nline | note");
 
-        Goal loaded = new FileSystemDAL(goalFile).findGoalById(goal.getId()).orElseThrow();
+        FileSystemDAL reopened = new FileSystemDAL(file);
+
+        Goal loaded = reopened.findGoalById(g.getId()).orElseThrow();
         assertEquals("A | B \\ C", loaded.getName());
         assertEquals("line one\nline two | end", loaded.getDescription());
+        assertEquals("pipe | milestone", reopened.findMilestoneById(m.getId()).orElseThrow().getMilestoneName());
+        assertEquals("task\\with\\backslashes", reopened.findTaskById(t.getId()).orElseThrow().getDescription());
+        assertEquals("multi\nline | note", reopened.getProgressEntriesForTask(t.getId()).get(0).getNote());
     }
 
     @Test
-    void updateAndDeleteOfAMissingGoalReturnFalse() {
-        Goal never = new Goal(42, "Never saved", "", "Other", today, "Not Started", 0, today);
+    void damagedAndUnknownLinesAreSkipped() throws IOException {
+        Goal g = planner.createGoal("Good", "d", "Other", today.plusDays(5), null, 0);
+        List<String> lines = new java.util.ArrayList<>(Files.readAllLines(file));
+        lines.add("");
+        lines.add("G|not-a-number|broken");
+        lines.add("X|unknown|record");
+        Files.write(file, lines);
 
-        assertFalse(dal.updateGoal(never));
-        assertFalse(dal.deleteGoal(42));
+        List<Goal> goals = new FileSystemDAL(file).getAllGoals();
+
+        assertEquals(1, goals.size());
+        assertEquals(g.getId(), goals.get(0).getId());
+        assertTrue(goals.get(0).getName().equals("Good"));
     }
 }
